@@ -1,0 +1,56 @@
+.map {
+    width: 100%;
+    height: 100%;
+}
+
+.buoy-left{
+    width: 240px;
+    float: left;
+}
+
+.buoy-left-map{
+    margin-left: 250px;
+    height: 100%;
+    padding: 0 0 0 10px;
+}
+
+.list-buoy {
+    overflow-y: scroll;
+}
+
+.list-buoy li {
+    border: 0px;
+}
+
+.list-buoy li a {
+    text-decoration: none;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    padding: 0 0 0 18px;
+}
+
+.list-buoy li.active a {
+    color: #ffffff;
+}
+
+.list-buoy li a:hover {
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+}
+
+/* 修改日期墨绿色主题 */
+.layui-laydate .layui-this {
+    background-color: #3498db !important;
+}
+
+.layui-laydate-content td.laydate-selected {
+    background-color: #5bc0de !important;
+}
+
+.layui-laydate-footer span[lay-type=date] {
+    color: #3498db !important;
+}
+
+.layui-laydate-footer span:hover {
+    color: #217dbb!important;
+}

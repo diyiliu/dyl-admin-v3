@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no"/>
+
+    <title>帝一流</title>
+
+    <link th:href="@{/webjars/font-awesome/4.3.0/css/font-awesome.css}" type="text/css" rel="stylesheet"/>
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/plugin/completer/completer.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/css/bootstrap-clearmin.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/css/roboto.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/css/material-design.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/css/small-n-flat.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/css/dyl-admin.css}" type="text/css" rel="stylesheet">
+</head>
+<body class="cm-no-transition cm-1-navbar">
+    <div id="cm-menu">
+        <nav class="cm-navbar cm-navbar-primary">
+            <div class="cm-flex"><a href="index.html" class="cm-logo"></a></div>
+            <div class="btn btn-primary md-menu-white" data-toggle="cm-menu"></div>
+        </nav>
+        <div id="cm-menu-content">
+            <div id="cm-menu-items-wrapper">
+                <div id="cm-menu-scroller">
+                    <ul class="cm-menu-items">
+                        <li class="active"><a href="index.html" class="sf-house">首页</a></li>
+                        <li class="cm-submenu">
+                            <a class="sf-compass">海洋浮球 <span class="caret"></span></a>
+                            <ul>
+                                <li><a href="buoy-list.html">浮球列表</a></li>
+                                <li><a href="buoy-history-data.html">历史回放</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="dashboard-sales.html" class="sf-dashboard">Dashboard</a></li>
+                        <li><a href="components-text.html" class="sf-brick">Components</a></li>
+                        <li class="cm-submenu">
+                            <a class="sf-window-layout">Navbar layouts <span class="caret"></span></a>
+                            <ul>
+                                <li><a href="layouts-breadcrumb1.html">1st nav breadcrumb</a></li>
+                                <li><a href="layouts-breadcrumb2.html">2nd nav breadcrumb</a></li>
+                                <li><a href="layouts-tabs.html">2nd nav tabs</a></li>
+                            </ul>
+                        </li>
+                        <li class="cm-submenu">
+                            <a class="sf-cat">Icons <span class="caret"></span></a>
+                            <ul>
+                                <li><a href="ico-sf.html">Small-n-flat</a></li>
+                                <li><a href="ico-md.html">Material Design</a></li>
+                                <li><a href="ico-fa.html">Font Awesome</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="notepad.html" class="sf-notepad">Text Editor</a></li>
+                        <li><a href="login.html" class="sf-lock-open">Login page</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header id="cm-header">
+        <nav class="cm-navbar cm-navbar-primary">
+            <div class="btn btn-primary md-menu-white hidden-md hidden-lg" data-toggle="cm-menu"></div>
+            <div class="cm-flex">
+                <h1>首页</h1>
+                <form id="cm-search" action="index.html" method="get">
+                    <input type="search" name="q" autocomplete="off" placeholder="Search...">
+                </form>
+            </div>
+            <div class="pull-right">
+                <div id="cm-search-btn" class="btn btn-primary md-search-white" data-toggle="cm-search"></div>
+            </div>
+            <div class="dropdown pull-right">
+                <button class="btn btn-primary md-account-circle-white" data-toggle="dropdown"></button>
+                <ul class="dropdown-menu">
+                    <li class="disabled text-center">
+                        <a style="cursor:default;"><strong>John Smith</strong></a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-fw fa-cog"></i> Settings</a>
+                    </li>
+                    <li>
+                        <a href="login.html"><i class="fa fa-fw fa-sign-out"></i> Sign out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div id="global">
+        <!-- 内容区域 -->
+        <div layout:fragment="content"></div>
+        <footer class="cm-footer"><span class="pull-left">帝一流</span><span class="pull-right">&copy; diyiliu.cc</span></footer>
+    </div>
+    <script th:src="@{/webjars/jquery/2.1.3/dist/jquery.js}"></script>
+    <script th:src="@{/webjars/jquery-mousewheel/3.1.12/jquery.mousewheel.js}"></script>
+    <script th:src="@{/webjars/jquery.cookie/1.4.1/jquery.cookie.js}"></script>
+    <script th:src="@{/webjars/fastclick/1.0.6/lib/fastclick.js}"></script>
+    <script th:src="@{/webjars/bootstrap/3.3.4/dist/js/bootstrap.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
+    <script th:src="@{/static/plugin/completer/completer.js}"></script>
+    <script th:src="@{/static/plugin/laydate/laydate.js}"></script>
+    <script th:src="@{/static/js/clearmin.js}"></script>
+    <script th:src="@{/static/js/dyl.plugin.js}"></script>
+</body>
+</html>
