@@ -32,6 +32,7 @@ public class SysAsset {
 
     private String iconCss;
 
+    /** 是否为菜单资源 0: 否; 1: 是*/
     private Integer isMenu;
 
     private Integer sort;

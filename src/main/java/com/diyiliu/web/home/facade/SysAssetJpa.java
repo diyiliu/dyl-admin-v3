@@ -13,5 +13,5 @@ import java.util.List;
 
 public interface SysAssetJpa extends JpaRepository<SysAsset, Long> {
 
-    List<SysAsset> findByTypeInOrderByPidAscSortAsc(String... types);
+    List<SysAsset> findByIsMenuOrderByPidAscSortAsc(int isMenu);
 }

@@ -27,13 +27,12 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(HttpSession session){
-//        List<SysAsset> assetList = sysAssetJpa.findAll(Sort.by(new String[]{"pid, sort"}));
+        // 所有菜单节点
+        List<SysAsset> assetList = sysAssetJpa.findByIsMenuOrderByPidAscSortAsc(1);
 
-        List<SysAsset> assetList = sysAssetJpa.findByTypeInOrderByPidAscSortAsc(new String[]{"node", "menu"});
-        // 菜单根节点
+        // 根节点
         List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == null).collect(Collectors.toList());
-
-        // 菜单子节点
+        // 子节点
         Map<Long, List<SysAsset>> menuMap = assetList.stream().filter(a -> a.getPid() != null)
                 .collect(Collectors.groupingBy(SysAsset::getPid));
 
