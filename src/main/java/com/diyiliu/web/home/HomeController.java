@@ -1,11 +1,12 @@
 package com.diyiliu.web.home;
 
-import com.diyiliu.web.home.dto.SysAsset;
-import com.diyiliu.web.home.facade.SysAssetJpa;
+import com.diyiliu.web.sys.dto.SysAsset;
+import com.diyiliu.web.sys.facade.SysAssetJpa;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -26,14 +27,14 @@ public class HomeController {
     private SysAssetJpa sysAssetJpa;
 
     @GetMapping("/")
-    public String index(HttpSession session){
+    public String index(HttpSession session, Model model){
         // 所有菜单节点
         List<SysAsset> assetList = sysAssetJpa.findByIsMenuOrderByPidAscSortAsc(1);
 
         // 根节点
-        List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == null).collect(Collectors.toList());
+        List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
         // 子节点
-        Map<Long, List<SysAsset>> menuMap = assetList.stream().filter(a -> a.getPid() != null)
+        Map<Long, List<SysAsset>> menuMap = assetList.stream().filter(a -> a.getPid() > 0)
                 .collect(Collectors.groupingBy(SysAsset::getPid));
 
         for (SysAsset asset: rootList){
@@ -46,8 +47,17 @@ public class HomeController {
             }
         }
 
-        rootList.get(0).setActive(1);
         session.setAttribute("menus", rootList);
+        session.setAttribute("active", rootList.get(0));
+
         return "index";
+    }
+
+    @GetMapping("/home/{menu}")
+    public String show(@PathVariable("menu") String menu, HttpSession session){
+        SysAsset asset = sysAssetJpa.findByController("home/" + menu);
+        session.setAttribute("active", asset);
+
+        return asset.getView();
     }
 }

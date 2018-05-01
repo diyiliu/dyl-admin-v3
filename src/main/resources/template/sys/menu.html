@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <meta charset="UTF-8">
+    <title>帝一流</title>
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/plugin/treegrid/css/jquery.treegrid.css}" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content" class="container-fluid">
+    <div class="panel panel-default auto-height-header">
+        <div class="panel-heading">
+            菜单管理
+        </div>
+        <div class="panel-body">
+            <div class="btn-group" role="group" id="toolbar">
+                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-plus"></i> 添加</button>
+                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i> 修改</button>
+                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-remove"></i> 删除</button>
+            </div>
+            <table id="menu-table"></table>
+        </div>
+    </div>
+</div>
+<div layout:fragment="myJs">
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
+    <script th:src="@{/static/plugin/treegrid/js/bootstrap-table-treegrid.js}"></script>
+    <script th:src="@{/static/plugin/treegrid/js/jquery.treegrid.js}"></script>
+    <script th:inline="javascript">
+        $(function () {
+            var autoHeightHeader = $("div.auto-height-header").height();
+            var tableHeight = autoHeightHeader - (40 + 35);
+
+            var $table = $('#menu-table');
+            $table.bootstrapTable({
+                height: tableHeight,
+                sidePagination: 'server',
+                url: /*[[@{/sys/assetList}]]*/,
+                method: 'post',
+                toolbar: '#toolbar',
+                // 条纹
+                striped: true,
+                idField: 'id',
+                columns: [
+                    {
+                        field: 'ck',
+                        checkbox: true
+                    },
+                    {
+                        field: 'name',
+                        title: '菜单名称'
+                    },
+                    {
+                        field: 'type',
+                        title: '类型',
+                        sortable: true,
+                        align: 'center',
+                        formatter: 'typeFormatter'
+                    },
+                    {
+                        field: 'controller',
+                        title: '控制器'
+                    },
+                    {
+                        field: 'view',
+                        title: '视图'
+                    },
+                    {
+                        field: 'isMenu',
+                        title: '导航菜单',
+                        align: 'center',
+                        formatter: function (v) {
+                            if (v == 1){
+
+                                return '是';
+                            }
+
+                            return '否';
+                        }
+                    },
+                    {
+                        field: 'sort',
+                        title: '排序'
+                    },
+                    {
+                        field: 'iconCss',
+                        title: '图标',
+                        align: 'center',
+                        formatter: 'iconFormatter'
+                    }
+                ],
+                treeShowField: 'name',
+                parentIdField: 'pid',
+                onLoadSuccess: function () {
+                    $table.treegrid({
+                        treeColumn: 1,
+                        onChange: function () {
+                            $table.bootstrapTable('resetWidth');
+                        }
+                    });
+                }
+            });
+        });
+
+        // 格式化类型
+        function typeFormatter(value, row, index) {
+            if (value === 'menu') {
+                return '菜单';
+            }
+            if (value === 'button') {
+                return '按钮';
+            }
+            if (value === 'node') {
+                return '节点';
+            }
+            return '-';
+        }
+
+        // 格式化图标
+        function iconFormatter(value, row, index) {
+            return '<span class="' + value + '" style="width: 24px;height: 24px;display: inline-block"></span>';
+        }
+    </script>
+</div>
+</body>
+</html>

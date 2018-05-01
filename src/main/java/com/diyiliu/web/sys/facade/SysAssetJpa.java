@@ -1,6 +1,6 @@
-package com.diyiliu.web.home.facade;
+package com.diyiliu.web.sys.facade;
 
-import com.diyiliu.web.home.dto.SysAsset;
+import com.diyiliu.web.sys.dto.SysAsset;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +14,6 @@ import java.util.List;
 public interface SysAssetJpa extends JpaRepository<SysAsset, Long> {
 
     List<SysAsset> findByIsMenuOrderByPidAscSortAsc(int isMenu);
+
+    SysAsset findByController(String controller);
 }

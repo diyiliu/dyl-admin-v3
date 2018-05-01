@@ -5,16 +5,14 @@ Dyl = {
     }
 };
 
-$(function () {
-/*
-    var map = new AMap.Map('amap',{
-        resizeEnable: true,
-        zoom: 6
-    });
 
-    AMap.plugin(["AMap.ToolBar", "AMap.Scale"], function() {
-        map.addControl(new AMap.ToolBar());
-        map.addControl(new AMap.Scale());
-    });
- */
+$(function () {
+    var autoHeight =  $(window).height() - (51 + 40 + 40 + 52);
+    $("div.auto-height").height(autoHeight);
+
+    var autoHeightHeader =  $(window).height() - (51 + 40 + 52);
+    $("div.auto-height-header").height(autoHeightHeader);
+
+    var autoHeightTab=  $(window).height() - (51 + 52 + 40 + 52);
+    $("div.auto-height-tab").height(autoHeightTab);
 });

@@ -1,4 +1,4 @@
-package com.diyiliu.web.home.dto;
+package com.diyiliu.web.sys.dto;
 
 import lombok.Data;
 
@@ -23,12 +23,14 @@ public class SysAsset {
     private Long pid;
 
     private String name;
-
+    
     private String type;
 
+    /** 控制器(路径) */
     private String controller;
 
-    private String action;
+    /** 视图 */
+    private String view;
 
     private String iconCss;
 
@@ -39,7 +41,4 @@ public class SysAsset {
 
     @Transient
     private List<SysAsset> children;
-
-    @Transient
-    private Integer active;
 }
