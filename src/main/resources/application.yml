@@ -33,3 +33,20 @@ spring:
 # LOGGING
 logging:
   config: 'classpath:logback.xml'
+
+# shiro
+shiro:
+  login-url: '/login'
+  success-url: '/home'
+  hash-algorithm: MD5
+  hash-iterations: 2
+  username-param: username
+  password-param: password
+  remember-me-param: rememberMe
+  filter-chain-definitions:
+    /login: authc
+    /logout: anon
+    /unauthorized: anon
+    /static/: anon
+    /authenticated: authc
+    /**: user
