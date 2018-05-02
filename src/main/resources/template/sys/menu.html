@@ -56,7 +56,6 @@
                     {
                         field: 'type',
                         title: '类型',
-                        sortable: true,
                         align: 'center',
                         formatter: 'typeFormatter'
                     },
@@ -121,7 +120,8 @@
 
         // 格式化图标
         function iconFormatter(value, row, index) {
-            return '<span class="' + value + '" style="width: 24px;height: 24px;display: inline-block"></span>';
+            return '<span class="' + value + '" ' +
+                'style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
         }
     </script>
 </div>
