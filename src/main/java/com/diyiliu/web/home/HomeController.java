@@ -27,10 +27,9 @@ public class HomeController {
     private SysAssetJpa sysAssetJpa;
 
     @GetMapping("/")
-    public String index(HttpSession session, Model model){
+    public String index(HttpSession session){
         // 所有菜单节点
         List<SysAsset> assetList = sysAssetJpa.findByIsMenuOrderByPidAscSortAsc(1);
-
         // 根节点
         List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
         // 子节点

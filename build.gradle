@@ -6,6 +6,8 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
+    mavenCentral()
     jcenter()
 }
 
@@ -42,4 +44,8 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }
