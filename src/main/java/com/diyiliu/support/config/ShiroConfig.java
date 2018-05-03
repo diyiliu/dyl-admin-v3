@@ -1,8 +1,9 @@
 package com.diyiliu.support.config;
 
 import com.diyiliu.support.config.properties.ShiroProperties;
-import com.diyiliu.support.shiro.cache.SpringCacheManagerWrapper;
+import com.diyiliu.support.shiro.cache.SpringCacheManager;
 import com.diyiliu.support.shiro.filter.FormLoginFilter;
+import com.diyiliu.support.shiro.helper.PasswordHelper;
 import com.diyiliu.support.shiro.matcher.RetryCredentialsMatcher;
 import com.diyiliu.support.shiro.realm.UserRealm;
 import com.diyiliu.web.account.facade.SysUserJpa;
@@ -58,7 +59,7 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public RetryCredentialsMatcher retryCredentialsMatcher(SpringCacheManagerWrapper cacheManager, SysUserJpa sysUserJpa) {
+    public RetryCredentialsMatcher retryCredentialsMatcher(SpringCacheManager cacheManager, SysUserJpa sysUserJpa) {
         RetryCredentialsMatcher matcher = new RetryCredentialsMatcher(cacheManager, sysUserJpa);
         matcher.setHashAlgorithmName(shiroProperties.getHashAlgorithmName());
         matcher.setHashIterations(shiroProperties.getHashIterations());
@@ -96,8 +97,8 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public SpringCacheManagerWrapper cacheManagerWrapper(EhCacheCacheManager ehCacheCacheManager) {
-        SpringCacheManagerWrapper cacheManager = new SpringCacheManagerWrapper();
+    public SpringCacheManager cacheManagerWrapper(EhCacheCacheManager ehCacheCacheManager) {
+        SpringCacheManager cacheManager = new SpringCacheManager();
         cacheManager.setCacheManager(ehCacheCacheManager);
 
         return cacheManager;
@@ -133,7 +134,7 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public DefaultWebSecurityManager securityManager(UserRealm userRealm, SpringCacheManagerWrapper cacheManager) {
+    public DefaultWebSecurityManager securityManager(UserRealm userRealm, SpringCacheManager cacheManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userRealm);
         securityManager.setCacheManager(cacheManager);
@@ -193,5 +194,14 @@ public class ShiroConfig {
         attributeSourceAdvisor.setSecurityManager(securityManager);
 
         return attributeSourceAdvisor;
+    }
+
+    @Bean
+    public PasswordHelper passwordHelper() {
+        PasswordHelper passwordHelper = new PasswordHelper();
+        passwordHelper.setHashAlgorithmName(shiroProperties.getHashAlgorithmName());
+        passwordHelper.setHashIterations(shiroProperties.getHashIterations());
+
+        return passwordHelper;
     }
 }

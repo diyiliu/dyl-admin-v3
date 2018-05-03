@@ -10,11 +10,11 @@ import org.springframework.cache.support.SimpleValueWrapper;
 import java.util.*;
 
 /**
- * Description: SpringCacheManagerWrapper
+ * Description: SpringCacheManager
  * Author: DIYILIU
  * Update: 2018-05-02 21:58
  */
-public class SpringCacheManagerWrapper implements CacheManager {
+public class SpringCacheManager implements CacheManager {
 
     private org.springframework.cache.CacheManager cacheManager;
 

@@ -16,7 +16,7 @@
         <div id="cm-menu">
             <nav class="cm-navbar cm-navbar-primary">
                 <div class="cm-flex">
-                    <a href="index.html" class="cm-logo"></a>
+                    <a th:href="@{/}" class="cm-logo"></a>
                 </div>
                 <div class="btn btn-primary md-menu-white" data-toggle="cm-menu"></div>
             </nav>
@@ -43,9 +43,6 @@
                                            th:text="${child.getName()}"></a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li>
-                                <a href="login.html" class="sf-lock-open">Login page</a>
                             </li>
                         </ul>
                     </div>

@@ -42,7 +42,7 @@ logging:
 # shiro
 shiro:
   login-url: '/login'
-  success-url: '/home'
+  success-url: '/'
   hash-algorithm: MD5
   hash-iterations: 2
   username-param: username
@@ -52,6 +52,7 @@ shiro:
     /login: authc
     /logout: anon
     /unauthorized: anon
-    /static/: anon
+    /webjars/**: anon
+    /static/**: anon
     /authenticated: authc
     /**: user
