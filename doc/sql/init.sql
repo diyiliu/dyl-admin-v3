@@ -8,7 +8,7 @@ INSERT INTO sys_asset (id, name, pid, type, controller, view, icon_css, is_menu,
 VALUES (3, '浮球列表', 2, 'menu', 'home/buoy1', 'buoy/list', null, 1, 1);
 
 INSERT INTO sys_asset (id, name, pid, type, controller, view, icon_css, is_menu, sort)
-VALUES (4, '历史回放',  2,  'menu', 'home/buoy2', 'buoy/history-data', null, 1, 2);
+VALUES (4, '历史回放',  2,  'menu', 'home/buoy2', 'buoy/historyData', null, 1, 2);
 
 
 INSERT INTO sys_asset (id, name, pid, type, controller, view, icon_css, is_menu, sort)

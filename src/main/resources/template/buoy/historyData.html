@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <meta charset="UTF-8">
+    <title>帝一流</title>
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
+</head>
+<body class="cm-no-transition cm-2-navbar">
+<nav layout:fragment="header-nav" class="cm-navbar cm-navbar-default cm-navbar-slideup">
+    <div class="cm-flex">
+        <div class="nav-tabs-container">
+            <ul class="nav nav-tabs">
+                <li  class="active"><a href="buoy-history-data.html">历史数据</a></li>
+                <li><a href="buoy-history-trace.html">历史轨迹</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div layout:fragment="content" class="container-fluid">
+    <div class="panel panel-default auto-height-tab">
+        <div class="panel-heading ">
+            浮球信息
+        </div>
+        <div class="panel-body">
+            <form action="#" class="form-group form-horizontal">
+                <div class="row" id="buoy-search">
+                    <div class="col-sm-3 col-md-2">
+                        <input type="text" class="form-control" placeholder="浮标名称" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="gpsTime" placeholder="采集时间">
+                            <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="btnTime">
+                                             <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
+                                        </button>
+                                </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-md-2 col-md-offset-4">
+                        <button type="submit" class="btn btn-primary btn-block">查询</button>
+                    </div>
+                </div>
+            </form>
+            <table id="buoy-table" class="table table-hover"></table>
+        </div>
+    </div>
+</div>
+<div layout:fragment="myJs">
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
+    <script th:src="@{/static/js/buoy.data.js}"></script>
+</div>
+</body>
+</html>
