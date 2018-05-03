@@ -4,7 +4,6 @@ import com.diyiliu.web.sys.dto.SysRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.management.relation.Role;
 import java.util.List;
 
 /**
@@ -17,5 +16,5 @@ public interface SysRoleJpa extends JpaRepository<SysRole, Long> {
     @Query(value = "SELECT r.id,r.name ,r.code ,r.comment FROM sys_role r " +
             "INNER JOIN sys_user u ON u.username = ? " +
             "INNER JOIN rel_user_role t ON t.user_id = u.id AND t.role_id = r.id", nativeQuery = true)
-    List<Role> findByUser(String username);
+    List<SysRole> findByUser(String username);
 }

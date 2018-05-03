@@ -2,15 +2,25 @@ package com.diyiliu.support.shiro.realm;
 
 import com.diyiliu.web.account.dto.SysUser;
 import com.diyiliu.web.account.facade.SysUserJpa;
+import com.diyiliu.web.sys.dto.SysPrivilege;
+import com.diyiliu.web.sys.dto.SysRole;
+import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
+import com.diyiliu.web.sys.facade.SysRoleJpa;
+import netscape.security.Privilege;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
 import javax.annotation.Resource;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Description: UserRealm
@@ -19,13 +29,15 @@ import javax.annotation.Resource;
  */
 
 public class UserRealm extends AuthorizingRealm {
-
-    @Resource
+    
     private SysUserJpa sysUserJpa;
 
+    private SysRoleJpa sysRoleJpa;
+    
+    private SysPrivilegeJpa sysPrivilegeJpa;
+    
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-
         String username = (String) token.getPrincipal();
         SysUser user = sysUserJpa.findByUsername(username);
 
@@ -55,22 +67,34 @@ public class UserRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-
         String username = (String) principals.getPrimaryPrincipal();
+        List<SysRole> roleList = sysRoleJpa.findByUser(username);
 
-/*        List<Role> roleList = userService.findUserRoles(username);
-        Set<String> roleCodes = roleList.stream().map(Role::getRoleCode).collect(Collectors.toSet());
-        Set<Long> roleIds = roleList.stream().map(Role::getId).collect(Collectors.toSet());
-
-        List<Privilege> privilegeList = userService.findPrivileges("role", roleIds);
-        Set<String> permissions = privilegeList.stream().map(Privilege::getPermission).collect(Collectors.toSet());
+        Set<String> codes = new HashSet();
+        Set<Long> roles = new HashSet();
+        for (SysRole role: roleList){
+            roles.add(role.getId());
+            codes.add(role.getCode());
+        }
+        List<SysPrivilege> privilegeList = sysPrivilegeJpa.findByMasterAndMasterValueIn("role", roles);
+        Set<String> permissions = privilegeList.stream().map(SysPrivilege::getPermission).collect(Collectors.toSet());
 
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        authorizationInfo.setRoles(roleCodes);
+        authorizationInfo.setRoles(codes);
         authorizationInfo.setStringPermissions(permissions);
 
-        return authorizationInfo;*/
+        return authorizationInfo;
+    }
 
-        return null;
+    public void setSysUserJpa(SysUserJpa sysUserJpa) {
+        this.sysUserJpa = sysUserJpa;
+    }
+
+    public void setSysRoleJpa(SysRoleJpa sysRoleJpa) {
+        this.sysRoleJpa = sysRoleJpa;
+    }
+
+    public void setSysPrivilegeJpa(SysPrivilegeJpa sysPrivilegeJpa) {
+        this.sysPrivilegeJpa = sysPrivilegeJpa;
     }
 }

@@ -1,4 +1,4 @@
-# https://docs.spring.io/spring-boot/docs/1.5.9.RELEASE/reference/htmlsingle/#common-application-properties
+# https://docs.spring.io/spring-boot/docs/2.0.0.RELEASE/reference/htmlsingle/#common-application-properties
 # SPRING
 spring:
   profiles:
@@ -11,6 +11,11 @@ spring:
     encoding: UTF-8
     mode: HTML5
     cache: false
+
+  # ehcache
+  cache:
+    ehcache:
+      config: 'classpath:/config/ehcache.xml'
 
   mvc:
     static-path-pattern: '/static/**'

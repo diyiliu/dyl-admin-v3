@@ -1,14 +1,27 @@
 package com.diyiliu.support.config;
 
 import com.diyiliu.support.config.properties.ShiroProperties;
+import com.diyiliu.support.shiro.cache.SpringCacheManagerWrapper;
+import com.diyiliu.support.shiro.filter.FormLoginFilter;
+import com.diyiliu.support.shiro.matcher.RetryCredentialsMatcher;
+import com.diyiliu.support.shiro.realm.UserRealm;
+import com.diyiliu.web.account.facade.SysUserJpa;
+import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
+import com.diyiliu.web.sys.facade.SysRoleJpa;
 import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,30 +32,76 @@ import java.util.Map;
  * Update: 2018-05-02 21:52
  */
 
-
+@EnableCaching
 @Configuration
 @EnableConfigurationProperties(ShiroProperties.class)
 public class ShiroConfig {
 
+    @Resource
+    private SysUserJpa sysUserJpa;
+
+    @Resource
+    private SysRoleJpa sysRoleJpa;
+
+    @Resource
+    private SysPrivilegeJpa sysPrivilegeJpa;
+
     @Autowired
     private ShiroProperties shiroProperties;
+
+
+    /**
+     * 密码重试
+     *
+     * @param cacheManager
+     * @param sysUserJpa
+     * @return
+     */
+    @Bean
+    public RetryCredentialsMatcher retryCredentialsMatcher(SpringCacheManagerWrapper cacheManager, SysUserJpa sysUserJpa) {
+        RetryCredentialsMatcher matcher = new RetryCredentialsMatcher(cacheManager, sysUserJpa);
+        matcher.setHashAlgorithmName(shiroProperties.getHashAlgorithmName());
+        matcher.setHashIterations(shiroProperties.getHashIterations());
+        matcher.setStoredCredentialsHexEncoded(true);
+
+        return matcher;
+    }
 
     /**
      * realm实现
      *
      * @return
-
+     */
     @Bean
-    public UserRealm userRealm() {
+    public UserRealm userRealm(RetryCredentialsMatcher retryCredentialsMatcher) {
         UserRealm userRealm = new UserRealm();
-        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
-        matcher.setHashAlgorithmName(shiroProperties.getHashAlgorithmName());
-        matcher.setHashIterations(shiroProperties.getHashIterations());
-        userRealm.setCredentialsMatcher(matcher);
+        userRealm.setCachingEnabled(true);
+        userRealm.setAuthenticationCachingEnabled(true);
+        userRealm.setAuthenticationCacheName("authenticationCache");
+        userRealm.setAuthorizationCachingEnabled(true);
+        userRealm.setAuthorizationCacheName("authorizationCache");
+        userRealm.setCredentialsMatcher(retryCredentialsMatcher);
+
+        userRealm.setSysUserJpa(sysUserJpa);
+        userRealm.setSysRoleJpa(sysRoleJpa);
+        userRealm.setSysPrivilegeJpa(sysPrivilegeJpa);
 
         return userRealm;
-    }     */
+    }
 
+    /**
+     * 缓存管理器
+     *
+     * @param ehCacheCacheManager
+     * @return
+     */
+    @Bean
+    public SpringCacheManagerWrapper cacheManagerWrapper(EhCacheCacheManager ehCacheCacheManager) {
+        SpringCacheManagerWrapper cacheManager = new SpringCacheManagerWrapper();
+        cacheManager.setCacheManager(ehCacheCacheManager);
+
+        return cacheManager;
+    }
 
     /**
      * 会话管理器
@@ -72,16 +131,52 @@ public class ShiroConfig {
      * 安全管理器
      *
      * @return
-
+     */
     @Bean
-    public DefaultWebSecurityManager securityManager() {
-
+    public DefaultWebSecurityManager securityManager(UserRealm userRealm, SpringCacheManagerWrapper cacheManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(userRealm());
+        securityManager.setRealm(userRealm);
+        securityManager.setCacheManager(cacheManager);
         securityManager.setSessionManager(sessionManager());
-        securityManager.setCacheManager(redisCacheManager());
 
         return securityManager;
+    }
+
+    /**
+     * shiro过滤器
+     *
+     * @return
+     */
+    @Bean
+    public ShiroFilterFactoryBean shiroFilter(DefaultWebSecurityManager securityManager) {
+        ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
+        factoryBean.setSecurityManager(securityManager);
+        factoryBean.setLoginUrl(shiroProperties.getLoginUrl());
+        factoryBean.setSuccessUrl(shiroProperties.getSuccessUrl());
+
+        Map<String, Filter> filters = new LinkedHashMap<>();
+        filters.put("authc", formAuthenticationFilter());
+        factoryBean.setFilters(filters);
+        factoryBean.setFilterChainDefinitionMap(shiroProperties.getFilterChainDefinitions());
+
+        return factoryBean;
+    }
+
+    /**
+     * 表单身份验证过滤器
+     *
+     * @return
+     */
+    @Bean
+    public FormLoginFilter formAuthenticationFilter() {
+        FormLoginFilter formLoginFilter = new FormLoginFilter();
+        formLoginFilter.setLoginUrl(shiroProperties.getLoginUrl());
+        formLoginFilter.setSuccessUrl(shiroProperties.getSuccessUrl());
+        formLoginFilter.setUsernameParam(shiroProperties.getUsernameParam());
+        formLoginFilter.setPasswordParam(shiroProperties.getPasswordParam());
+        formLoginFilter.setRememberMeParam(shiroProperties.getRememberMeParam());
+
+        return formLoginFilter;
     }
 
     @Bean
@@ -93,49 +188,10 @@ public class ShiroConfig {
     }
 
     @Bean
-    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor() {
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager) {
         AuthorizationAttributeSourceAdvisor attributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
-        attributeSourceAdvisor.setSecurityManager(securityManager());
+        attributeSourceAdvisor.setSecurityManager(securityManager);
 
         return attributeSourceAdvisor;
-    }  */
-
-    /**
-     * shiro过滤器
-     *
-     * @return
-
-    @Bean
-    public ShiroFilterFactoryBean shiroFilter() {
-        ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
-        factoryBean.setSecurityManager(securityManager());
-        factoryBean.setLoginUrl(shiroProperties.getLoginUrl());
-        factoryBean.setSuccessUrl(shiroProperties.getSuccessUrl());
-
-        Map<String, Filter> filters = new LinkedHashMap<>();
-        filters.put("authc", formAuthenticationFilter());
-        factoryBean.setFilters(filters);
-
-        factoryBean.setFilterChainDefinitionMap(shiroProperties.getFilterChainDefinitions());
-
-        return factoryBean;
-    }   */
-
-    /**
-     * 表单身份验证过滤器
-     *
-     * @return
-
-    @Bean
-    public FormLoginFilter formAuthenticationFilter() {
-        FormLoginFilter formLoginFilter = new FormLoginFilter();
-        formLoginFilter.setLoginUrl(shiroProperties.getLoginUrl());
-        formLoginFilter.setSuccessUrl(shiroProperties.getSuccessUrl());
-        formLoginFilter.setUsernameParam(shiroProperties.getUsernameParam());
-        formLoginFilter.setPasswordParam(shiroProperties.getPasswordParam());
-        formLoginFilter.setRememberMeParam(shiroProperties.getRememberMeParam());
-
-        return formLoginFilter;
-    }     */
-
+    }
 }

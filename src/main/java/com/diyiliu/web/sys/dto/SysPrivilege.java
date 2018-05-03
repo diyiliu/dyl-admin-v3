@@ -1,13 +1,21 @@
 package com.diyiliu.web.sys.dto;
 
+import lombok.Data;
+
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Description: SysPrivilege
  * Author: DIYILIU
  * Update: 2018-05-02 22:44
  */
+
+@Data
+@Entity
+@Table(name = "sys_privilege")
 public class SysPrivilege {
 
     @Id
