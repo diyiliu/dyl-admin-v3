@@ -1,3 +1,6 @@
+/*==============================================================*/
+/* sys_asset 系统资源                                           */
+/*==============================================================*/
 INSERT INTO sys_asset (id, name, pid, type, controller, view, icon_css, is_menu, sort)
 VALUES (1, '首页', 0 , 'menu', '', 'index', 'sf-house', 1, 1);
 
@@ -23,3 +26,9 @@ VALUES (7, '角色管理', 5, 'menu', 'home/role', 'sys/role', null, 1, 2);
 INSERT INTO sys_asset (id, name, pid, type, controller, view, icon_css, is_menu, sort)
 VALUES (8, '菜单管理',  5, 'menu', 'home/menu', 'sys/menu', null, 1, 3);
 
+/*==============================================================*/
+/* sys_asset 系统资源                                           */
+/*==============================================================*/
+
+INSERT INTO sys_user (id, username, password, salt, name)
+VALUES (1, 'admin', 'b0f46351f2dac85a119e0dab1f8d7dbf', '6833ce53eb357aa850c8aeb750d256ee', '管理员');
