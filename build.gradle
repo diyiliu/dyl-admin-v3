@@ -2,6 +2,7 @@ group 'com.diyiliu'
 version '3.0'
 
 apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 
@@ -11,8 +12,8 @@ repositories {
     jcenter()
 }
 
-ext{
-    springBootVersion='1.5.9.RELEASE'
+ext {
+    springBootVersion = '1.5.9.RELEASE'
     thymeleafVersion = '3.0.9.RELEASE'
     shiroVersion = '1.4.0'
 }
@@ -61,3 +62,20 @@ dependencies {
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
+
+jar {
+    archiveName = 'dyl-admin3.jar'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+    }
+}
+
