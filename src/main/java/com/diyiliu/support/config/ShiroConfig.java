@@ -6,7 +6,7 @@ import com.diyiliu.support.shiro.filter.FormLoginFilter;
 import com.diyiliu.support.shiro.helper.PasswordHelper;
 import com.diyiliu.support.shiro.matcher.RetryCredentialsMatcher;
 import com.diyiliu.support.shiro.realm.UserRealm;
-import com.diyiliu.web.account.facade.SysUserJpa;
+import com.diyiliu.web.sys.facade.SysUserJpa;
 import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
 import com.diyiliu.web.sys.facade.SysRoleJpa;
 import org.apache.shiro.session.mgt.SessionManager;

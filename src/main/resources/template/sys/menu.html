@@ -9,13 +9,20 @@
     <link th:href="@{/static/plugin/treegrid/css/jquery.treegrid.css}" type="text/css" rel="stylesheet">
 </head>
 <body>
-<h1 layout:fragment="header-title">系统管理</h1>
+<div  layout:fragment="cm-flex" class="cm-flex">
+    <div class="cm-breadcrumb-container">
+        <ol class="breadcrumb">
+            <li><a href="#">系统管理</a></li>
+            <li class="active">菜单管理</li>
+        </ol>
+    </div>
+    <form id="cm-search" action="index.html" method="get">
+        <input type="search" name="q" autocomplete="off" placeholder="Search...">
+    </form>
+</div>
 <div layout:fragment="content" class="container-fluid">
-    <div class="panel panel-default auto-height-header">
-        <div class="panel-heading">
-            菜单管理
-        </div>
-        <div class="panel-body">
+    <div class="panel panel-default">
+        <div class="panel-body auto-height">
             <div class="btn-group" role="group" id="toolbar">
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-plus"></i> 添加</button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i> 修改</button>
@@ -32,8 +39,8 @@
     <script th:src="@{/static/plugin/treegrid/js/jquery.treegrid.js}"></script>
     <script th:inline="javascript">
         $(function () {
-            var autoHeightHeader = $("div.auto-height-header").height();
-            var tableHeight = autoHeightHeader - (40 + 35);
+            var autoHeight = $("div.auto-height").height();
+            var tableHeight = autoHeight - 0;
 
             var $table = $('#menu-table');
             $table.bootstrapTable({

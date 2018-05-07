@@ -1,7 +1,7 @@
 package com.diyiliu.support.shiro.realm;
 
-import com.diyiliu.web.account.dto.SysUser;
-import com.diyiliu.web.account.facade.SysUserJpa;
+import com.diyiliu.web.sys.dto.SysUser;
+import com.diyiliu.web.sys.facade.SysUserJpa;
 import com.diyiliu.web.sys.dto.SysPrivilege;
 import com.diyiliu.web.sys.dto.SysRole;
 import com.diyiliu.web.sys.facade.SysPrivilegeJpa;

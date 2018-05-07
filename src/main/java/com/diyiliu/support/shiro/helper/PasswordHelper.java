@@ -1,6 +1,6 @@
 package com.diyiliu.support.shiro.helper;
 
-import com.diyiliu.web.account.dto.SysUser;
+import com.diyiliu.web.sys.dto.SysUser;
 import org.apache.shiro.crypto.RandomNumberGenerator;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;

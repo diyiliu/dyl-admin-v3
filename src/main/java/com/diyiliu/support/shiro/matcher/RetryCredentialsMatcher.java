@@ -1,7 +1,7 @@
 package com.diyiliu.support.shiro.matcher;
 
-import com.diyiliu.web.account.dto.SysUser;
-import com.diyiliu.web.account.facade.SysUserJpa;
+import com.diyiliu.web.sys.dto.SysUser;
+import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

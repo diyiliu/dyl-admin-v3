@@ -1,6 +1,6 @@
-package com.diyiliu.web.account.facade;
+package com.diyiliu.web.sys.facade;
 
-import com.diyiliu.web.account.dto.SysUser;
+import com.diyiliu.web.sys.dto.SysUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

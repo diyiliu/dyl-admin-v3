@@ -54,3 +54,7 @@
 .layui-laydate-footer span:hover {
     color: #217dbb!important;
 }
+
+.search-block {
+    border-bottom: 5px solid #eee;
+}

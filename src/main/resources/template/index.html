@@ -6,7 +6,12 @@
     <title>帝一流</title>
 </head>
 <body>
-<h1 layout:fragment="header-title">首页</h1>
+<div  layout:fragment="cm-flex" class="cm-flex">
+    <h1>首页</h1>
+    <form id="cm-search" action="index.html" method="get">
+        <input type="search" name="q" autocomplete="off" placeholder="Search...">
+    </form>
+</div>
 <div layout:fragment="content" class="container-fluid cm-container-white">
     <h2 style="margin-top:0;">帝一流首页</h2>
     <p>个人网站后台管理系统</p>
