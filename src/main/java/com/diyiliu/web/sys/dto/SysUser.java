@@ -1,8 +1,11 @@
 package com.diyiliu.web.sys.dto;
 
 import lombok.Data;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import javax.persistence.*;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -47,6 +50,9 @@ public class SysUser {
     private String lastLoginIp;
 
     private Date lastLoginTime;
+
+    @Transient
+    private String expireTimeStr;
 
     public String getCredentialsSalt() {
         return username + salt;

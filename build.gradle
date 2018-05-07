@@ -40,12 +40,14 @@ dependencies {
     compile group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '2.3.0'
 
     // 注意jquery版本(必要时需要排除版本冲突)
-    compile group: 'org.webjars.bower', name: 'jquery', version: '3.3.1'
-    compile group: 'org.webjars.bower', name: 'jquery-mousewheel', version: '3.1.12'
-    compile group: 'org.webjars.bower', name: 'jquery.cookie', version: '1.4.1'
-    compile group: 'org.webjars.bower', name: 'fastclick', version: '1.0.6'
-    compile group: 'org.webjars.bower', name: 'bootstrap', version: '3.3.4'
-    compile group: 'org.webjars.bower', name: 'font-awesome', version: '4.3.0'
+    compile group: 'org.webjars.npm', name: 'jquery', version: '2.1.4'
+    compile group: 'org.webjars.npm', name: 'jquery-mousewheel', version: '3.1.13'
+    compile group: 'org.webjars.npm', name: 'jquery.cookie', version: '1.4.1'
+    compile group: 'org.webjars.npm', name: 'fastclick', version: '1.0.6'
+    compile group: 'org.webjars.npm', name: 'bootstrap', version: '3.3.4'
+    compile group: 'org.webjars.npm', name: 'font-awesome', version: '4.3.0'
+
+    compile group: 'org.webjars.npm', name: 'toastr', version: '2.1.4'
 
     // other
     compile group: 'com.alibaba', name: 'druid', version: '1.1.2'

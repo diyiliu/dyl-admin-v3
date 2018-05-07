@@ -8,7 +8,7 @@
     <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
 </head>
 <body>
-<div  layout:fragment="cm-flex" class="cm-flex">
+<div layout:fragment="cm-flex" class="cm-flex">
     <div class="cm-breadcrumb-container">
         <ol class="breadcrumb">
             <li><a href="#">系统管理</a></li>
@@ -39,15 +39,79 @@
                 </form>
             </div>
             <div class="btn-group" role="group" id="toolbar">
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-plus"></i></button>
+                <button type="button" class="btn btn-default"  data-toggle="modal" data-target="#userModal"><i class="fa fa-fw fa-plus"></i></button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-trash-o"></i></button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i></button>
             </div>
-            <table id="user-table"></table>
+            <table id="userTable"></table>
         </div>
     </div>
 </div>
 <div layout:fragment="myJs">
+    <div id="userModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h5 class="modal-title">
+                        添加用户
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" id="userForm">
+                        <div class="form-group">
+                            <label for="username" class="col-sm-2 control-label">登录名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="username" name="username" placeholder="登录名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="col-sm-2 control-label">密码</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password2" class="col-sm-2 control-label">确认密码</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="password2" placeholder="确认密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-2 control-label">用户名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="用户名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tel" class="col-sm-2 control-label">电话</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="tel" name="tel" placeholder="电话">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="col-sm-2 control-label">邮箱</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="邮箱">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expireTime" class="col-sm-2 control-label">过期时间</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="expireTime" name="expireTimeStr" placeholder="过期时间">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveUser">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
     <script th:inline="javascript">
@@ -55,7 +119,7 @@
             var autoHeight = $("div.auto-height").height();
             var rowHeight = $('#search-block').height();
             var tableHeight = autoHeight - rowHeight;
-            $('#user-table').bootstrapTable({
+            $('#userTable').bootstrapTable({
                 height: tableHeight,
                 sidePagination: 'server',
                 url: /*[[@{/sys/userList}]]*/,
@@ -117,6 +181,72 @@
                         formatter: 'statusFormat'
                     }
                 ]
+            });
+
+            var expire = new Date();
+            expire.setFullYear(expire.getFullYear() + 1);
+            expire.setDate(expire.getDate() - 1);
+
+            laydate.render({
+                elem: '#expireTime'
+                , type: 'datetime'
+                , value: expire
+            });
+
+            $('#saveUser').on('click', function () {
+                var param = $('#userForm').serialize();
+                $.ajax({
+                    type: 'post',
+                    url: /*[[@{/sys/user}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (result) {
+                        alert(result);
+                        if (result == 1) {
+                            $("#userForm")[0].reset();
+                            $('#userModal').modal('hide');
+                            $('#userTable').bootstrapTable('refresh');
+
+                            toastr.success('保存成功', '提示', {
+                                timeOut: 1000,
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-bottom-right",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut",
+                                "tapToDismiss": false
+                            });
+                        }else {
+                            toastr.error('保存失败', '错误', {
+                                timeOut: 1000,
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-bottom-right",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut",
+                                "tapToDismiss": false
+                            });
+                        }
+                    }
+                });
             });
         });
 
