@@ -6,8 +6,6 @@ import com.diyiliu.web.sys.dto.SysAsset;
 import com.diyiliu.web.sys.dto.SysUser;
 import com.diyiliu.web.sys.facade.SysAssetJpa;
 import com.diyiliu.web.sys.facade.SysUserJpa;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,12 +50,18 @@ public class SysController {
 
     @PostMapping("/user")
     public Integer saveUser(SysUser user) {
+        // 默认密码
+        user.setPassword("123456");
         passwordHelper.encryptPassword(user);
         user.setStatus(1);
         user.setCreateTime(new Date());
         user.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
 
-        sysUserJpa.save(user);
+        user = sysUserJpa.save(user);
+        if (user == null){
+
+            return 0;
+        }
 
         return 1;
     }

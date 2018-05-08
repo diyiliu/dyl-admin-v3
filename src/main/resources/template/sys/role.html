@@ -13,7 +13,7 @@
     <div class="cm-breadcrumb-container">
         <ol class="breadcrumb">
             <li><a href="#">系统管理</a></li>
-            <li class="active">菜单管理</li>
+            <li class="active">角色管理</li>
         </ol>
     </div>
     <form id="cm-search" action="index.html" method="get">
@@ -28,7 +28,7 @@
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i> 修改</button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-remove"></i> 删除</button>
             </div>
-            <table id="menu-table"></table>
+            <table id="role-table"></table>
         </div>
     </div>
 </div>
@@ -42,8 +42,7 @@
             var autoHeight = $("div.auto-height").height();
             var tableHeight = autoHeight - 0;
 
-            var $table = $('#menu-table');
-            $table.bootstrapTable({
+            $('#role-table').bootstrapTable({
                 height: tableHeight,
                 sidePagination: 'server',
                 url: /*[[@{/sys/assetList}]]*/,
@@ -98,17 +97,7 @@
                         align: 'center',
                         formatter: 'iconFormatter'
                     }
-                ],
-                treeShowField: 'name',
-                parentIdField: 'pid',
-                onLoadSuccess: function () {
-                    $table.treegrid({
-                        treeColumn: 1,
-                        onChange: function () {
-                            $table.bootstrapTable('resetWidth');
-                        }
-                    });
-                }
+                ]
             });
         });
 
@@ -131,7 +120,6 @@
             return '<span class="' + value + '" ' +
                 'style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
         }
-
     </script>
 </div>
 </body>
