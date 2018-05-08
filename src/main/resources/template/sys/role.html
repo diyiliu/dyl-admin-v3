@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <title>帝一流</title>
     <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
-    <link th:href="@{/static/plugin/treegrid/css/jquery.treegrid.css}" type="text/css" rel="stylesheet">
 </head>
 <body>
 <div  layout:fragment="cm-flex" class="cm-flex">
@@ -24,33 +23,70 @@
     <div class="panel panel-default">
         <div class="panel-body auto-height">
             <div class="btn-group" role="group" id="toolbar">
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-plus"></i> 添加</button>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#roleModal"><i class="fa fa-fw fa-plus"></i> 添加</button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i> 修改</button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-remove"></i> 删除</button>
             </div>
-            <table id="role-table"></table>
+            <table id="roleTable"></table>
         </div>
     </div>
 </div>
 <div layout:fragment="myJs">
+    <div id="roleModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h5 class="modal-title">
+                        添加角色
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" id="roleForm">
+                        <div class="form-group">
+                            <label for="name" class="col-sm-2 control-label">角色名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="角色名称">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="code" class="col-sm-2 control-label">角色代码</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="code" name="code" placeholder="角色代码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment" class="col-sm-2 control-label">角色描述</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="comment" id="comment" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveRole">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
-    <script th:src="@{/static/plugin/treegrid/js/bootstrap-table-treegrid.js}"></script>
-    <script th:src="@{/static/plugin/treegrid/js/jquery.treegrid.js}"></script>
     <script th:inline="javascript">
         $(function () {
             var autoHeight = $("div.auto-height").height();
             var tableHeight = autoHeight - 0;
 
-            $('#role-table').bootstrapTable({
+            $('#roleTable').bootstrapTable({
                 height: tableHeight,
                 sidePagination: 'server',
-                url: /*[[@{/sys/assetList}]]*/,
+                url: /*[[@{/sys/roleList}]]*/,
                 method: 'post',
                 toolbar: '#toolbar',
                 // 条纹
                 striped: true,
-                idField: 'id',
                 columns: [
                     {
                         field: 'ck',
@@ -58,68 +94,94 @@
                     },
                     {
                         field: 'name',
-                        title: '菜单名称'
+                        title: '角色名称'
                     },
                     {
-                        field: 'type',
-                        title: '类型',
+                        field: 'code',
+                        title: '角色代码',
                         align: 'center',
-                        formatter: 'typeFormatter'
                     },
                     {
-                        field: 'controller',
-                        title: '控制器'
+                        field: 'comment',
+                        title: '角色描述'
                     },
                     {
-                        field: 'view',
-                        title: '视图'
+                        field: 'createUser',
+                        title: '创建人'
                     },
                     {
-                        field: 'isMenu',
-                        title: '导航菜单',
+                        field: 'createTime',
+                        title: '创建时间',
                         align: 'center',
-                        formatter: function (v) {
-                            if (v == 1){
-
-                                return '是';
-                            }
-
-                            return '否';
+                    },
+                    {
+                        field: '',
+                        title: '授权',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            return '<a href="#"><span class="sf-wrench-screwdriver" style="display: inline-block;' +
+                                'width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
                         }
-                    },
-                    {
-                        field: 'sort',
-                        title: '排序'
-                    },
-                    {
-                        field: 'iconCss',
-                        title: '图标',
-                        align: 'center',
-                        formatter: 'iconFormatter'
                     }
                 ]
             });
+
+            $('#saveRole').on('click', function () {
+                var param = $('#roleForm').serialize();
+                $.ajax({
+                    type: 'post',
+                    url: /*[[@{/sys/role}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (result) {
+                        if (result == 1) {
+                            $("#roleForm")[0].reset();
+                            $('#roleModal').modal('hide');
+                            $('#roleTable').bootstrapTable('refresh');
+
+                            toastr.success('保存成功', '提示', {
+                                timeOut: 1000,
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-bottom-right",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut",
+                                "tapToDismiss": false
+                            });
+                        }else {
+                            toastr.error('保存失败', '错误', {
+                                timeOut: 1000,
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-bottom-right",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut",
+                                "tapToDismiss": false
+                            });
+                        }
+                    }
+                });
+            });
         });
 
-        // 格式化类型
-        function typeFormatter(value, row, index) {
-            if (value === 'menu') {
-                return '菜单';
-            }
-            if (value === 'button') {
-                return '按钮';
-            }
-            if (value === 'node') {
-                return '节点';
-            }
-            return '-';
-        }
-
-        // 格式化图标
-        function iconFormatter(value, row, index) {
-            return '<span class="' + value + '" ' +
-                'style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
-        }
     </script>
 </div>
 </body>

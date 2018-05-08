@@ -2,10 +2,8 @@ package com.diyiliu.web.sys.dto;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Description: SysRole
@@ -29,4 +27,8 @@ public class SysRole {
     private String code;
 
     private String comment;
+
+    private String createUser;
+
+    private Date createTime;
 }

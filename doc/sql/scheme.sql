@@ -61,10 +61,12 @@ alter table sys_privilege comment '权限';
 create table sys_role
 (
    id                   int not null auto_increment,
-   pid                  int,
-   name                 varchar(50),
-   code                 varchar(30),
-   comment              varchar(100) comment '注释',
+   pid                  int comment '父ID',
+   name                 varchar(50) comment '角色名称',
+   code                 varchar(30) comment '角色代码',
+   comment              varchar(100) comment '角色描述',
+   create_user       int comment '创建人',
+   create_time          datetime comment '创建时间',
    primary key (id)
 );
 
@@ -82,7 +84,7 @@ create table sys_user
    tel                  varchar(15) comment '联系电话',
    org_id               int comment '用户所属机构',
    create_time          datetime comment '创建时间',
-   create_user_id       int comment '创建人',
+   create_user       int comment '创建人',
    status               int comment '用户状态',
    expire_time          datetime comment '过期时间',
    login_count          int comment '登陆次数',

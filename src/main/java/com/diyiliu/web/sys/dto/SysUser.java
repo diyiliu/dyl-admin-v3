@@ -1,11 +1,8 @@
 package com.diyiliu.web.sys.dto;
 
 import lombok.Data;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 
 import javax.persistence.*;
-import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -39,7 +36,7 @@ public class SysUser {
 
     private Date createTime;
 
-    private Long createUserId;
+    private String createUser;
 
     private Integer status;
 
