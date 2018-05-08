@@ -53,6 +53,7 @@ public class SysController {
     @PostMapping("/user")
     public Integer saveUser(SysUser user) {
         passwordHelper.encryptPassword(user);
+        user.setStatus(1);
         user.setCreateTime(new Date());
         user.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
 
