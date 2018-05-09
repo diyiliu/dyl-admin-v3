@@ -3,20 +3,20 @@ package com.diyiliu.web.sys;
 import com.diyiliu.support.shiro.helper.PasswordHelper;
 import com.diyiliu.support.util.DateUtil;
 import com.diyiliu.web.sys.dto.SysAsset;
+import com.diyiliu.web.sys.dto.SysPrivilege;
 import com.diyiliu.web.sys.dto.SysRole;
 import com.diyiliu.web.sys.dto.SysUser;
 import com.diyiliu.web.sys.facade.SysAssetJpa;
+import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
 import com.diyiliu.web.sys.facade.SysRoleJpa;
 import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +41,9 @@ public class SysController {
 
     @Resource
     private SysRoleJpa sysRoleJpa;
+
+    @Resource
+    private SysPrivilegeJpa sysPrivilegeJpa;
 
     @Resource
     private PasswordHelper passwordHelper;
@@ -142,6 +145,34 @@ public class SysController {
 
         role = sysRoleJpa.save(role);
         if (role == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @Transactional
+    @PostMapping("/roleAsset")
+    public Integer roleAsset(@RequestBody List<SysPrivilege> privilegeList) {
+        long roleId = privilegeList.get(0).getMasterValue();
+
+        // 删除
+        sysPrivilegeJpa.deleteByMasterAndMasterValue("role", roleId);
+
+        List list = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toList());
+        List privileges = sysPrivilegeJpa.findByAssetIdIn(list);
+        for (int i = 0; i < privilegeList.size(); i++) {
+            SysPrivilege sysPrivilege = privilegeList.get(i);
+
+            Object[] objArr = (Object[]) privileges.get(i);
+            sysPrivilege.setAccess((String) objArr[1]);
+            sysPrivilege.setPermission((String) objArr[0]);
+        }
+
+        // 添加
+        privilegeList = sysPrivilegeJpa.save(privilegeList);
+        if (privilegeList == null) {
 
             return 0;
         }

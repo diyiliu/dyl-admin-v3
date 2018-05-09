@@ -25,8 +25,9 @@ create table rel_user_role
 create table sys_asset
 (
    id                   int not null auto_increment,
-   name                 varchar(50) comment '资源名称',
    pid                  int comment '父ID',
+   name                 varchar(50) comment '资源名称',
+   code                 varchar(50) comment '资源编码',
    type                 varchar(50) comment '类型',
    controller           varchar(100)  comment '控制器',
    view                 varchar(100)  comment '视图',
@@ -65,7 +66,7 @@ create table sys_role
    name                 varchar(50) comment '角色名称',
    code                 varchar(30) comment '角色代码',
    comment              varchar(100) comment '角色描述',
-   create_user       int comment '创建人',
+   create_user          varchar(50) comment '创建人',
    create_time          datetime comment '创建时间',
    primary key (id)
 );
@@ -84,7 +85,7 @@ create table sys_user
    tel                  varchar(15) comment '联系电话',
    org_id               int comment '用户所属机构',
    create_time          datetime comment '创建时间',
-   create_user       int comment '创建人',
+   create_user          varchar(50)  comment '创建人',
    status               int comment '用户状态',
    expire_time          datetime comment '过期时间',
    login_count          int comment '登陆次数',

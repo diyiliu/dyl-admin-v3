@@ -25,6 +25,8 @@ public class SysAsset {
     private Long pid;
 
     private String name;
+
+    private String code;
     
     private String type;
 
