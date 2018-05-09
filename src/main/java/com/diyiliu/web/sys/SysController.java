@@ -11,14 +11,17 @@ import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description: SysController
@@ -49,6 +52,52 @@ public class SysController {
         return sysAssetJpa.findAll();
     }
 
+    @GetMapping("/assetTree")
+    public List assetTree() {
+        List<SysAsset> assetList = sysAssetJpa.findAll(new Sort(Sort.Direction.ASC, new String[]{"pid", "sort"}));
+
+        // 根节点
+        List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
+        // 子节点
+        Map<Long, List<SysAsset>> menuMap = assetList.stream().filter(a -> a.getPid() > 0)
+                .collect(Collectors.groupingBy(SysAsset::getPid));
+
+        List treeList = new ArrayList();
+        for (SysAsset asset : rootList) {
+            treeList.add(toTree(asset, menuMap));
+        }
+
+        return treeList;
+    }
+
+    /**
+     * 转为树形结构数据
+     *
+     * @param sysAsset
+     * @param menuMap
+     * @return
+     */
+    private Map toTree(SysAsset sysAsset, Map<Long, List<SysAsset>> menuMap) {
+        Map map = sysAsset.toTreeItem();
+
+        long id = sysAsset.getId();
+        if (menuMap.containsKey(id)) {
+            map.put("open", 1);
+            map.put("checkbox", "hidden");
+
+            List items = new ArrayList();
+            List<SysAsset> list = menuMap.get(id);
+            for (SysAsset asset : list) {
+                items.add(asset.toTreeItem());
+
+                toTree(asset, menuMap);
+            }
+            map.put("items", items);
+        }
+
+        return map;
+    }
+
     @PostMapping("/userList")
     public List<SysUser> userList() {
         Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "lastLoginTime")});
@@ -69,7 +118,7 @@ public class SysController {
         user.setCreateUser((String) subject.getPrincipal());
 
         user = sysUserJpa.save(user);
-        if (user == null){
+        if (user == null) {
 
             return 0;
         }
@@ -84,16 +133,15 @@ public class SysController {
         return sysRoleJpa.findAll();
     }
 
-
     @PostMapping("/role")
-    public Integer saveRole(SysRole role){
+    public Integer saveRole(SysRole role) {
         Subject subject = SecurityUtils.getSubject();
 
         role.setCreateTime(new Date());
         role.setCreateUser((String) subject.getPrincipal());
 
         role = sysRoleJpa.save(role);
-        if (role == null){
+        if (role == null) {
 
             return 0;
         }

@@ -58,3 +58,11 @@
 .search-block {
     border-bottom: 5px solid #eee;
 }
+
+.modal-tree{
+    position: relative;
+    border: 1px solid #dfdfdf;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.09);
+    width: 100%;
+    height: 400px;
+}

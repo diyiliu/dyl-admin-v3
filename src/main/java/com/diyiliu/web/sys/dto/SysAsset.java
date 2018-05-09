@@ -3,7 +3,9 @@ package com.diyiliu.web.sys.dto;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description: SysAsset
@@ -41,4 +43,12 @@ public class SysAsset {
 
     @Transient
     private List<SysAsset> children;
+
+    public Map toTreeItem(){
+        Map map = new HashMap();
+        map.put("id", id);
+        map.put("text", name);
+
+        return map;
+    }
 }
