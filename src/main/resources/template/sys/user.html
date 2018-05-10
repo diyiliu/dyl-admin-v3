@@ -39,9 +39,9 @@
                 </form>
             </div>
             <div class="btn-group" role="group" id="toolbar">
-                <button type="button" class="btn btn-default"  data-toggle="modal" data-target="#userModal"><i class="fa fa-fw fa-plus"></i></button>
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-trash-o"></i></button>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#userModal"><i class="fa fa-fw fa-plus"></i></button>
                 <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i></button>
+                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-trash-o"></i></button>
             </div>
             <table id="userTable"></table>
         </div>
@@ -130,8 +130,15 @@
                         title: '姓名'
                     },
                     {
-                        field: '',
-                        title: '角色'
+                        field: 'roles',
+                        title: '角色',
+                        formatter: function (value, row, index) {
+                            if (value.length > 0){
+                                return value[0]['name'];
+                            }
+
+                            return '';
+                        }
                     },
                     {
                         field: '',
@@ -165,7 +172,13 @@
                         field: 'status',
                         title: '状态',
                         align: 'center',
-                        formatter: 'statusFormat'
+                        formatter: function (value, row, index) {
+                            if (1 == value){
+                                return '<span class="sf-switch-on" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
+                            }
+
+                            return '<span class="sf-switch-off" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
+                        }
                     }
                 ]
             });
@@ -235,15 +248,6 @@
                 });
             });
         });
-
-        // 格式化状态
-        function statusFormat(value, row, index) {
-            if (1 == value){
-                return '<span class="sf-switch-on" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
-            }
-
-            return '<span class="sf-switch-off" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
-        }
     </script>
 </div>
 </body>

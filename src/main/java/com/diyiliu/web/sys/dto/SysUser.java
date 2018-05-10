@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Description: SysUser
@@ -31,6 +32,12 @@ public class SysUser {
     private String tel;
 
     private String email;
+
+    @ManyToMany
+    @JoinTable(name = "rel_user_role",
+    joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private List<SysRole> roles;
 
     private Long orgId;
 
