@@ -182,10 +182,11 @@
                 var roleId = aObj.data('id');
                 $('#roleId').val(roleId);
 
+                var path = /*[[@{/sys/assetTree/}]]*/;
                 myTreeView = new dhtmlXTreeView({
                     parent: "menuTree",
                     checkboxes: true,
-                    json: /*[[@{/sys/assetTree}]]*/,
+                    json: path + roleId,
                 });
             });
 
@@ -195,10 +196,15 @@
 
                 var dataArr = [];
                 for (var i = 0; i < assetArr.length; i++){
+                    var id = assetArr[i];
+
                     var obj = {};
                     obj.master = 'role';
                     obj.masterValue = roleId;
-                    obj.accessValue = assetArr[i];
+                    obj.accessValue = id;
+                    obj.access = myTreeView.getUserData(id, 'access');
+                    obj.permission = myTreeView.getUserData(id, 'permission');
+
                     dataArr[i] = obj;
                 }
 

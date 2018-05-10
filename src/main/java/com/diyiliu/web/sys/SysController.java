@@ -55,10 +55,12 @@ public class SysController {
         return sysAssetJpa.findAll();
     }
 
-    @GetMapping("/assetTree")
-    public List assetTree() {
-        List<SysAsset> assetList = sysAssetJpa.findAll(new Sort(Sort.Direction.ASC, new String[]{"pid", "sort"}));
+    @GetMapping("/assetTree/{roleId}")
+    public List assetTree(@PathVariable("roleId") long roleId) {
+        List<SysPrivilege> privilegeList = sysPrivilegeJpa.findByMasterAndMasterValue("role", roleId);
+        List<Long> list = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toList());
 
+        List<SysAsset> assetList = sysAssetJpa.findAll(new Sort(Sort.Direction.ASC, new String[]{"pid", "sort"}));
         // 根节点
         List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
         // 子节点
@@ -67,7 +69,7 @@ public class SysController {
 
         List treeList = new ArrayList();
         for (SysAsset asset : rootList) {
-            treeList.add(toTree(asset, menuMap));
+            treeList.add(toTree("home", asset, menuMap, list));
         }
 
         return treeList;
@@ -76,12 +78,13 @@ public class SysController {
     /**
      * 转为树形结构数据
      *
+     * @param code
      * @param sysAsset
      * @param menuMap
      * @return
      */
-    private Map toTree(SysAsset sysAsset, Map<Long, List<SysAsset>> menuMap) {
-        Map map = sysAsset.toTreeItem();
+    private Map toTree(String code, SysAsset sysAsset, Map<Long, List<SysAsset>> menuMap, List<Long> ownList) {
+        Map map = sysAsset.toTreeItem(code, ownList);
 
         long id = sysAsset.getId();
         if (menuMap.containsKey(id)) {
@@ -91,9 +94,10 @@ public class SysController {
             List items = new ArrayList();
             List<SysAsset> list = menuMap.get(id);
             for (SysAsset asset : list) {
-                items.add(asset.toTreeItem());
+                String parentCode = sysAsset.getCode();
 
-                toTree(asset, menuMap);
+                items.add(asset.toTreeItem(parentCode, ownList));
+                toTree(parentCode, asset, menuMap, ownList);
             }
             map.put("items", items);
         }
@@ -159,16 +163,6 @@ public class SysController {
 
         // 删除
         sysPrivilegeJpa.deleteByMasterAndMasterValue("role", roleId);
-
-        List list = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toList());
-        List privileges = sysPrivilegeJpa.findByAssetIdIn(list);
-        for (int i = 0; i < privilegeList.size(); i++) {
-            SysPrivilege sysPrivilege = privilegeList.get(i);
-
-            Object[] objArr = (Object[]) privileges.get(i);
-            sysPrivilege.setAccess((String) objArr[1]);
-            sysPrivilege.setPermission((String) objArr[0]);
-        }
 
         // 添加
         privilegeList = sysPrivilegeJpa.save(privilegeList);

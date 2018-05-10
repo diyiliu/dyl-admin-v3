@@ -20,7 +20,7 @@ $(function () {
 function alertTip(type, msg) {
     if ('success' == type){
         toastr.success(msg, '提示', {
-            timeOut: 1000,
+            timeOut: 3000,
             "closeButton": true,
             "debug": false,
             "newestOnTop": true,
@@ -42,7 +42,7 @@ function alertTip(type, msg) {
 
     if ('error' == type){
         toastr.error(msg, '错误', {
-            timeOut: 1000,
+            timeOut: 3000,
             "closeButton": true,
             "debug": false,
             "newestOnTop": true,

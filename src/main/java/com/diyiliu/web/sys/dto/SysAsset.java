@@ -46,10 +46,29 @@ public class SysAsset {
     @Transient
     private List<SysAsset> children;
 
-    public Map toTreeItem(){
+    /**
+     * 转为树形结构
+     *
+     * @param parentCode
+     * @param ownList
+     * @return
+     */
+    public Map toTreeItem(String parentCode, List<Long> ownList){
         Map map = new HashMap();
         map.put("id", id);
         map.put("text", name);
+
+        // 携带数据
+        Map data = new HashMap();
+        data.put("access", type);
+        data.put("permission", parentCode + ":" + code);
+
+        map.put("userdata", data);
+
+        // 设置选中
+        if (ownList.contains(id)){
+            map.put("checked", 1);
+        }
 
         return map;
     }
