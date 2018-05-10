@@ -141,9 +141,8 @@ public class SysController {
     }
 
     @PostMapping("/role")
-    public Integer saveRole(SysRole role) {
+    public Integer addRole(SysRole role) {
         Subject subject = SecurityUtils.getSubject();
-
         role.setCreateTime(new Date());
         role.setCreateUser((String) subject.getPrincipal());
 
@@ -155,6 +154,31 @@ public class SysController {
 
         return 1;
     }
+
+    @PutMapping("/role")
+    public Integer modifyRole(SysRole role) {
+        SysRole oldRole = sysRoleJpa.findById(role.getId());
+        oldRole.setName(role.getName());
+        oldRole.setCode(role.getCode());
+        oldRole.setComment(role.getComment());
+
+        role = sysRoleJpa.save(oldRole);
+        if (role == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @Transactional
+    @DeleteMapping("/role")
+    public Integer deleteRole(@RequestBody List<Long> ids) {
+        sysRoleJpa.deleteByIdIn(ids);
+
+        return 1;
+    }
+
 
     @Transactional
     @PostMapping("/roleAsset")

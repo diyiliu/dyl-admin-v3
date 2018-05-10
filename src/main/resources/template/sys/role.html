@@ -24,11 +24,9 @@
     <div class="panel panel-default">
         <div class="panel-body auto-height">
             <div class="btn-group" role="group" id="toolbar">
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#roleModal"><i
-                        class="fa fa-fw fa-plus"></i> 添加
-                </button>
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i> 修改</button>
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-remove"></i> 删除</button>
+                <button type="button" class="btn btn-default" id="addRole"><i class="fa fa-fw fa-plus"></i> 添加</button>
+                <button type="button" class="btn btn-default" id="editRole"><i class="fa fa-fw fa-pencil"></i> 修改</button>
+                <button type="button" class="btn btn-default" id="delRole"><i class="fa fa-fw fa-remove"></i> 删除</button>
             </div>
             <table id="roleTable"></table>
         </div>
@@ -47,6 +45,7 @@
                 </div>
                 <div class="modal-body">
                     <form class="form-horizontal" id="roleForm">
+                        <input type="hidden" id="id" name="id">
                         <div class="form-group">
                             <label for="name" class="col-sm-2 control-label">角色名称</label>
                             <div class="col-sm-10">
@@ -108,7 +107,8 @@
             var autoHeight = $("div.auto-height").height();
             var tableHeight = autoHeight - 0;
 
-            $('#roleTable').bootstrapTable({
+            var $table = $('#roleTable');
+            $table.bootstrapTable({
                 height: tableHeight,
                 sidePagination: 'server',
                 url: /*[[@{/sys/roleList}]]*/,
@@ -155,16 +155,20 @@
                 ]
             });
 
+            $('#addRole').on('click', function () {
+                $("#roleForm")[0].reset();
+                $('#roleModal').modal('show');
+            });
+
             $('#saveRole').on('click', function () {
                 var param = $('#roleForm').serialize();
                 $.ajax({
-                    type: 'post',
+                    type: $('#id').val() == ''? 'post': 'put',
                     url: /*[[@{/sys/role}]]*/,
                     data: param,
                     dataType: "json",
                     success: function (result) {
                         if (result == 1) {
-                            $("#roleForm")[0].reset();
                             $('#roleModal').modal('hide');
                             $('#roleTable').bootstrapTable('refresh');
 
@@ -174,6 +178,64 @@
                         }
                     }
                 });
+            });
+
+            $('#editRole').on('click', function () {
+                var roles = $table.bootstrapTable('getSelections');
+                if (roles.length != 1){
+                    swal("请选择一个角色进行修改!");
+
+                    return;
+                }
+
+                var role = roles[0];
+                $('#id').val(role['id']);
+                $('#name').val(role['name']);
+                $('#code').val(role['code']);
+                $('#comment').val(role['comment']);
+                $('#roleModal').modal('show');
+            });
+
+            $('#delRole').on('click', function () {
+                var roles = $table.bootstrapTable('getSelections');
+                if (roles.length < 1){
+                    swal("请至少选择一个角色进行删除!");
+
+                    return;
+                }
+                // 提示
+                swal({
+                        title: "确定删除选中角色?",
+                        text: "删除后将无法恢复!",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#bf6516",
+                        confirmButtonText: "删除!",
+                        closeOnConfirm: true
+                    },
+                    function(){
+                        var idArr = [];
+                        for (var i = 0; i < roles.length; i++){
+                            idArr[i] = roles[i]['id'];
+                        }
+                        $.ajax({
+                            type: 'delete',
+                            url: /*[[@{/sys/role}]]*/,
+                            contentType:"application/json;charset=utf-8",
+                            data: JSON.stringify(idArr),
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    $('#roleModal').modal('hide');
+                                    $('#roleTable').bootstrapTable('refresh');
+
+                                    alertTip('success', '删除成功');
+                                } else {
+                                    alertTip('error', '删除失败');
+                                }
+                            }
+                        });
+                    });
             });
 
             var myTreeView;
