@@ -26,7 +26,9 @@
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
                         <div class="col-sm-3 col-md-2">
-                            <input type="text" class="form-control" placeholder="用户名" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                            <input type="text" class="form-control" placeholder="用户名" data-toggle="completer"
+                                   data-suggest="true"
+                                   data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
                         </div>
                         <div class="col-sm-6 col-md-4">
                             <div class="input-group">
@@ -52,7 +54,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
                     <h5 class="modal-title" id="userModalTitle">
                         添加用户
                     </h5>
@@ -87,16 +90,19 @@
                         <div class="form-group">
                             <label for="selRole" class="col-sm-2 control-label">角色</label>
                             <div class="col-sm-10">
-                                <select id="selRole" name="roleId" data-placeholder="选择角色 ..." class="form-control chosen-select">
+                                <select id="selRole" name="roleId" data-placeholder="选择角色 ..."
+                                        class="form-control chosen-select">
                                     <option value=""></option>
-                                    <option th:each="role:${#request.getAttribute('roles')}" th:value="${role.id}" th:text="${role.name}"></option>
+                                    <option th:each="role:${#request.getAttribute('roles')}" th:value="${role.id}"
+                                            th:text="${role.name}"></option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="expireTime" class="col-sm-2 control-label">过期时间</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="expireTime" name="expireTimeStr" placeholder="过期时间">
+                                <input type="text" class="form-control" id="expireTime" name="expireTimeStr"
+                                       placeholder="过期时间">
                             </div>
                         </div>
                     </form>
@@ -145,7 +151,7 @@
                         field: 'roles',
                         title: '角色',
                         formatter: function (value, row, index) {
-                            if (value.length > 0){
+                            if (value.length > 0) {
                                 return value[0]['name'];
                             }
 
@@ -169,7 +175,7 @@
                         title: '创建时间',
                         formatter: function (value, row, index) {
                             var str = '';
-                            if (value){
+                            if (value) {
                                 str = value.substr(0, 10);
                             }
 
@@ -181,7 +187,7 @@
                         title: '状态',
                         align: 'center',
                         formatter: function (value, row, index) {
-                            if (1 == value){
+                            if (1 == value) {
                                 return '<span class="sf-switch-on" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
                             }
 
@@ -199,9 +205,8 @@
                 ]
             });
 
-
             $('#addUser').on('click', function () {
-                $("#userForm")[0].reset();
+                $('#userForm')[0].reset();
 
                 $('#userModalTitle').html('添加用户');
                 $('#userModal').modal('show');
@@ -221,7 +226,7 @@
             $('#saveUser').on('click', function () {
                 var param = $('#userForm').serialize();
                 $.ajax({
-                    type: $('#id').val() == ''? 'post': 'put',
+                    type: $('#id').val() == '' ? 'post' : 'put',
                     url: /*[[@{/sys/user}]]*/,
                     data: param,
                     dataType: "json",
@@ -240,18 +245,44 @@
 
             $('#editUser').on('click', function () {
                 var users = $table.bootstrapTable('getSelections');
-                if (users.length != 1){
+                if (users.length != 1) {
                     swal("请选择一个角色进行修改!");
 
                     return;
                 }
+                $('#selRole').chosen("destroy");
+                $('#userForm')[0].reset();
 
                 var user = users[0];
                 $('#id').val(user['id']);
+                $('#username').val(user['username']);
                 $('#name').val(user['name']);
+                $('#tel').val(user['tel']);
+                $('#email').val(user['email']);
 
                 $('#userModalTitle').html('修改角色');
+                document.getElementById('username').readOnly = true;
                 $('#userModal').modal('show');
+
+                var role = user['roles'][0];
+                if (role) {
+                    var roleId = ['id'];
+                    var options = document.getElementById('selRole').options;
+                    for (var i = 0; i < options.length; i++) {
+                        var o = options[i];
+                        if (o.value == roleId) {
+                            o.selected = true;
+                        }
+                    }
+                }
+
+                $('#selRole').chosen();
+
+                laydate.render({
+                    elem: '#expireTime'
+                    , type: 'datetime'
+                    , value: user['expireTime']
+                });
             });
         });
     </script>

@@ -156,7 +156,7 @@
             });
 
             $('#addRole').on('click', function () {
-                $("#roleForm")[0].reset();
+                $('#roleForm')[0].reset();
 
                 $('#roleModalTitle').html('添加角色');
                 $('#roleModal').modal('show');
@@ -189,6 +189,7 @@
 
                     return;
                 }
+                $('#roleForm')[0].reset();
 
                 var role = roles[0];
                 $('#id').val(role['id']);
