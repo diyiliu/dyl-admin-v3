@@ -122,14 +122,9 @@ public class SysController {
         user.setCreateTime(new Date());
         user.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
         user.setCreateUser((String) subject.getPrincipal());
-
-        SysRole role = new SysRole();
-        role.setId(roleId);
-        user.setRoles(new ArrayList(){
-            {
-                this.add(role);
-            }
-        });
+        if (roleId != null) {
+            user.setRoleIds(new Long[]{roleId});
+        }
 
         user = sysUserJpa.save(user);
         if (user == null) {
@@ -148,14 +143,8 @@ public class SysController {
         temp.setTel(user.getTel());
         temp.setEmail(user.getEmail());
         temp.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
-        if (roleId != null){
-            SysRole role = new SysRole();
-            role.setId(roleId);
-            temp.setRoles(new ArrayList(){
-                {
-                    this.add(role);
-                }
-            });
+        if (roleId != null) {
+            user.setRoleIds(new Long[]{roleId});
         }
 
         temp = sysUserJpa.save(temp);
@@ -206,17 +195,17 @@ public class SysController {
         Map respMap = new HashMap();
 
         String enPwd = passwordHelper.encryptPassword(temp.getUsername(), oldPwd, temp.getSalt());
-        if (enPwd.equals(temp.getPassword())){
+        if (enPwd.equals(temp.getPassword())) {
             temp.setPassword(newPwd);
             passwordHelper.encryptPassword(temp);
 
             temp = sysUserJpa.save(temp);
-            if (temp == null){
+            if (temp == null) {
 
                 respMap.put("result", "0");
                 respMap.put("msg", "修改密码失败!");
 
-            }else {
+            } else {
                 respMap.put("result", "1");
                 respMap.put("msg", "修改密码成功!");
             }

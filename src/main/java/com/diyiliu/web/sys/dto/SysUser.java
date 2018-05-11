@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class SysUser {
 
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "rel_user_role",
     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
@@ -64,5 +65,15 @@ public class SysUser {
 
     public String getCredentialsSalt() {
         return username + salt;
+    }
+
+    public void setRoleIds(Long[] ids){
+        roles = new ArrayList();
+        for (Long id: ids){
+            SysRole role = new SysRole();
+            role.setId(id);
+
+            roles.add(role);
+        }
     }
 }

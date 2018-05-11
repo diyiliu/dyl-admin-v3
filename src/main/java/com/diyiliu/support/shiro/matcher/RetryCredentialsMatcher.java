@@ -17,6 +17,8 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.session.Session;
 
+import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,14 +77,19 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
      * 初始化菜单
      * @param username
      */
+    @Transactional
     private void loadData(String username){
         // 把用户信息放在session里
         Session session = SecurityUtils.getSubject().getSession();
         SysUser user = sysUserJpa.findByUsername(username);
-        session.setAttribute("user", user);
 
         List<SysRole> roleList = user.getRoles();
-        Set roles = roleList.stream().map(SysRole::getId).collect(Collectors.toSet());
+        Set roles = new HashSet();
+        for (SysRole role: roleList){
+            roles.add(role.getId());
+        }
+        //Set roles = roleList.stream().map(SysRole::getId).collect(Collectors.toSet());
+
         List<SysPrivilege> privilegeList = sysPrivilegeJpa.findByMasterAndMasterValueIn("role", roles);
         Set assets = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toSet());
         Set nodes = sysAssetJpa.findByChildren(assets);
@@ -104,6 +111,8 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
                 }
             }
         }
+
+        session.setAttribute("user", user);
         // 初始化菜单
         session.setAttribute("menus", rootList);
     }
