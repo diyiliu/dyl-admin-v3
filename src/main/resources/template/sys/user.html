@@ -39,9 +39,9 @@
                 </form>
             </div>
             <div class="btn-group" role="group" id="toolbar">
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#userModal"><i class="fa fa-fw fa-plus"></i></button>
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-pencil"></i></button>
-                <button type="button" class="btn btn-default"><i class="fa fa-fw fa-trash-o"></i></button>
+                <button type="button" class="btn btn-default" id="addUser"><i class="fa fa-fw fa-plus"></i></button>
+                <button type="button" class="btn btn-default" id="editUser"><i class="fa fa-fw fa-pencil"></i></button>
+                <button type="button" class="btn btn-default" id="delUser"><i class="fa fa-fw fa-trash-o"></i></button>
             </div>
             <table id="userTable"></table>
         </div>
@@ -53,12 +53,13 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="userModalTitle">
                         添加用户
                     </h5>
                 </div>
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="userForm">
+                        <input type="hidden" id="id" name="id">
                         <div class="form-group">
                             <label for="username" class="col-sm-2 control-label">登录名</label>
                             <div class="col-sm-10">
@@ -81,6 +82,15 @@
                             <label for="email" class="col-sm-2 control-label">邮箱</label>
                             <div class="col-sm-10">
                                 <input type="email" class="form-control" id="email" name="email" placeholder="邮箱">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="selRole" class="col-sm-2 control-label">角色</label>
+                            <div class="col-sm-10">
+                                <select id="selRole" name="roleId" data-placeholder="选择角色 ..." class="form-control chosen-select">
+                                    <option value=""></option>
+                                    <option th:each="role:${#request.getAttribute('roles')}" th:value="${role.id}" th:text="${role.name}"></option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -107,7 +117,9 @@
             var autoHeight = $("div.auto-height").height();
             var rowHeight = $('#search-block').height();
             var tableHeight = autoHeight - rowHeight;
-            $('#userTable').bootstrapTable({
+
+            var $table = $('#userTable');
+            $table.bootstrapTable({
                 height: tableHeight,
                 sidePagination: 'server',
                 url: /*[[@{/sys/userList}]]*/,
@@ -118,7 +130,7 @@
                 striped: true,
                 columns: [
                     {
-                        field: 'ck',
+                        field: '',
                         checkbox: true
                     },
                     {
@@ -149,24 +161,20 @@
                         title: '手机'
                     },
                     {
-                        field: 'email',
-                        title: '邮箱'
-                    },
-                    {
-                        field: 'loginCount',
-                        title: '登录次数'
-                    },
-                    {
                         field: 'lastLoginTime',
                         title: '登录时间'
                     },
                     {
-                        field: 'createUser',
-                        title: '创建人'
-                    },
-                    {
                         field: 'createTime',
-                        title: '创建时间'
+                        title: '创建时间',
+                        formatter: function (value, row, index) {
+                            var str = '';
+                            if (value){
+                                str = value.substr(0, 10);
+                            }
+
+                            return '<span style="cursor: default" title="' + value + '">' + str + '</span>';
+                        }
                     },
                     {
                         field: 'status',
@@ -179,73 +187,71 @@
 
                             return '<span class="sf-switch-off" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
                         }
+                    },
+                    {
+                        field: '',
+                        title: '重置密码',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            return '<a href="#" title="重置密码"><span class="sf-lock" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
+                        }
                     }
                 ]
             });
 
-            var expire = new Date();
-            expire.setFullYear(expire.getFullYear() + 1);
-            expire.setDate(expire.getDate() - 1);
 
-            laydate.render({
-                elem: '#expireTime'
-                , type: 'datetime'
-                , value: expire
+            $('#addUser').on('click', function () {
+                $("#userForm")[0].reset();
+
+                $('#userModalTitle').html('添加用户');
+                $('#userModal').modal('show');
+                $('#selRole').chosen();
+
+                // 设置默认过期时间
+                var expire = new Date();
+                expire.setFullYear(expire.getFullYear() + 1);
+                expire.setDate(expire.getDate() - 1);
+                laydate.render({
+                    elem: '#expireTime'
+                    , type: 'datetime'
+                    , value: expire
+                });
             });
 
             $('#saveUser').on('click', function () {
                 var param = $('#userForm').serialize();
                 $.ajax({
-                    type: 'post',
+                    type: $('#id').val() == ''? 'post': 'put',
                     url: /*[[@{/sys/user}]]*/,
                     data: param,
                     dataType: "json",
                     success: function (result) {
                         if (result == 1) {
-                            $("#userForm")[0].reset();
                             $('#userModal').modal('hide');
                             $('#userTable').bootstrapTable('refresh');
 
-                            toastr.success('保存成功', '提示', {
-                                timeOut: 1000,
-                                "closeButton": true,
-                                "debug": false,
-                                "newestOnTop": true,
-                                "progressBar": true,
-                                "positionClass": "toast-bottom-right",
-                                "preventDuplicates": true,
-                                "onclick": null,
-                                "showDuration": "300",
-                                "hideDuration": "1000",
-                                "extendedTimeOut": "1000",
-                                "showEasing": "swing",
-                                "hideEasing": "linear",
-                                "showMethod": "fadeIn",
-                                "hideMethod": "fadeOut",
-                                "tapToDismiss": false
-                            });
-                        }else {
-                            toastr.error('保存失败', '错误', {
-                                timeOut: 1000,
-                                "closeButton": true,
-                                "debug": false,
-                                "newestOnTop": true,
-                                "progressBar": true,
-                                "positionClass": "toast-bottom-right",
-                                "preventDuplicates": true,
-                                "onclick": null,
-                                "showDuration": "300",
-                                "hideDuration": "1000",
-                                "extendedTimeOut": "1000",
-                                "showEasing": "swing",
-                                "hideEasing": "linear",
-                                "showMethod": "fadeIn",
-                                "hideMethod": "fadeOut",
-                                "tapToDismiss": false
-                            });
+                            alertTip('success', '保存成功');
+                        } else {
+                            alertTip('error', '保存失败');
                         }
                     }
                 });
+            });
+
+            $('#editUser').on('click', function () {
+                var users = $table.bootstrapTable('getSelections');
+                if (users.length != 1){
+                    swal("请选择一个角色进行修改!");
+
+                    return;
+                }
+
+                var user = users[0];
+                $('#id').val(user['id']);
+                $('#name').val(user['name']);
+
+                $('#userModalTitle').html('修改角色');
+                $('#userModal').modal('show');
             });
         });
     </script>

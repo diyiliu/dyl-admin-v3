@@ -1,5 +1,6 @@
 package com.diyiliu.web.sys.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,8 +24,10 @@ public class SysUser {
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
+    @JsonIgnore
     private String salt;
 
     private String name;
@@ -56,6 +59,7 @@ public class SysUser {
     private Date lastLoginTime;
 
     @Transient
+    @JsonIgnore
     private String expireTimeStr;
 
     public String getCredentialsSalt() {

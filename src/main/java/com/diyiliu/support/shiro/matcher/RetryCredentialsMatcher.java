@@ -48,16 +48,15 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
 
         boolean matches = super.doCredentialsMatch(token, info);
         if (matches) {
-            //clear retry count
+            // 清除重试次数
             passwordRetryCache.remove(username);
 
-            // 清除浏览器缓存 重新注入
+            // 把用户信息放在session里
             Session session = SecurityUtils.getSubject().getSession();
-            if (session.getAttribute("user") == null){
-                SysUser user = sysUserJpa.findByUsername(username);
-                session.setAttribute("user", user);
-            }
+            SysUser user = sysUserJpa.findByUsername(username);
+            session.setAttribute("user", user);
         }
+
         return matches;
     }
 }

@@ -1,17 +1,15 @@
 package com.diyiliu.support.shiro.realm;
 
-import com.diyiliu.web.sys.dto.SysUser;
-import com.diyiliu.web.sys.facade.SysUserJpa;
 import com.diyiliu.web.sys.dto.SysPrivilege;
 import com.diyiliu.web.sys.dto.SysRole;
+import com.diyiliu.web.sys.dto.SysUser;
 import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
 import com.diyiliu.web.sys.facade.SysRoleJpa;
-import org.apache.shiro.SecurityUtils;
+import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
@@ -27,13 +25,13 @@ import java.util.stream.Collectors;
  */
 
 public class UserRealm extends AuthorizingRealm {
-    
+
     private SysUserJpa sysUserJpa;
 
     private SysRoleJpa sysRoleJpa;
-    
+
     private SysPrivilegeJpa sysPrivilegeJpa;
-    
+
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String username = (String) token.getPrincipal();
@@ -45,7 +43,6 @@ public class UserRealm extends AuthorizingRealm {
         }
 
         /*if (Boolean.TRUE.equals(user.getLocked())) {
-
             // 用户锁定
             throw new LockedAccountException();
         }*/
@@ -56,21 +53,18 @@ public class UserRealm extends AuthorizingRealm {
                 ByteSource.Util.bytes(user.getCredentialsSalt()),
                 getName());
 
-        // 当验证都通过后，把用户信息放在session里
-        Session session = SecurityUtils.getSubject().getSession();
-        session.setAttribute("user", user);
-
         return authenticationInfo;
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         String username = (String) principals.getPrimaryPrincipal();
-        List<SysRole> roleList = sysRoleJpa.findByUser(username);
+        SysUser user = sysUserJpa.findByUsername(username);
+        List<SysRole> roleList = user.getRoles();
 
         Set<String> codes = new HashSet();
         Set<Long> roles = new HashSet();
-        for (SysRole role: roleList){
+        for (SysRole role : roleList) {
             roles.add(role.getId());
             codes.add(role.getCode());
         }

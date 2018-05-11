@@ -39,7 +39,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">×</span></button>
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="roleModalTitle">
                         添加角色
                     </h5>
                 </div>
@@ -157,6 +157,8 @@
 
             $('#addRole').on('click', function () {
                 $("#roleForm")[0].reset();
+
+                $('#roleModalTitle').html('添加角色');
                 $('#roleModal').modal('show');
             });
 
@@ -193,6 +195,8 @@
                 $('#name').val(role['name']);
                 $('#code').val(role['code']);
                 $('#comment').val(role['comment']);
+
+                $('#roleModalTitle').html('修改角色');
                 $('#roleModal').modal('show');
             });
 

@@ -13,6 +13,7 @@ import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -113,7 +114,7 @@ public class SysController {
     }
 
     @PostMapping("/user")
-    public Integer saveUser(SysUser user) {
+    public Integer saveUser(SysUser user, @Param("roleId") Long roleId) {
         Subject subject = SecurityUtils.getSubject();
 
         // 默认密码
@@ -123,6 +124,14 @@ public class SysController {
         user.setCreateTime(new Date());
         user.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
         user.setCreateUser((String) subject.getPrincipal());
+
+        SysRole role = new SysRole();
+        role.setId(roleId);
+        user.setRoles(new ArrayList(){
+            {
+                this.add(role);
+            }
+        });
 
         user = sysUserJpa.save(user);
         if (user == null) {
