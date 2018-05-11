@@ -16,6 +16,11 @@
         <link th:href="@{/static/css/dyl-admin.css}" type="text/css" rel="stylesheet">
     </head>
     <body class="cm-no-transition cm-1-navbar">
+        <div class="preloader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+            </svg>
+        </div>
         <div id="cm-menu">
             <nav class="cm-navbar cm-navbar-primary">
                 <div class="cm-flex">
@@ -64,7 +69,7 @@
                     <ul class="dropdown-menu">
                         <li class="disabled text-center">
                             <a style="cursor:default;">
-                                <strong th:text="${session.user.username}">Diyiliu</strong>
+                                <strong th:text="${session.user.username}">DIYILIU</strong>
                             </a>
                         </li>
                         <li class="divider"></li>
@@ -102,8 +107,7 @@
                         </h5>
                     </div>
                     <div class="modal-body">
-                        <form class="form-horizontal" role="form" id="userForm">
-                            <input type="hidden" id="id" name="id">
+                        <form class="form-horizontal" role="form">
                             <div class="form-group">
                                 <label for="oldPwd" class="col-sm-2 control-label">原密码</label>
                                 <div class="col-sm-10">
