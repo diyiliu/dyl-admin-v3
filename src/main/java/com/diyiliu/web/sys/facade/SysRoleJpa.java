@@ -2,7 +2,6 @@ package com.diyiliu.web.sys.facade;
 
 import com.diyiliu.web.sys.dto.SysRole;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -19,8 +18,6 @@ public interface SysRoleJpa extends JpaRepository<SysRole, Long> {
             "INNER JOIN rel_user_role t ON t.user_id = u.id AND t.role_id = r.id", nativeQuery = true)
     List<SysRole> findByUser(String username);
 */
-
-    SysRole findById(long id);
 
     void deleteByIdIn(List<Long> ids);
 }

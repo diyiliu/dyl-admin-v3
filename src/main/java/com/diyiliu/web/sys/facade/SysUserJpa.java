@@ -3,6 +3,8 @@ package com.diyiliu.web.sys.facade;
 import com.diyiliu.web.sys.dto.SysUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  * Description: SysUserJpa
  * Author: DIYILIU
@@ -11,4 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface SysUserJpa extends JpaRepository<SysUser, Long> {
 
     SysUser findByUsername(String username);
+
+    void deleteByIdIn(List<Long> ids);
 }

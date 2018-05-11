@@ -13,7 +13,6 @@ import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -106,6 +105,7 @@ public class SysController {
         return map;
     }
 
+
     @PostMapping("/userList")
     public List<SysUser> userList() {
         Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "lastLoginTime")});
@@ -114,7 +114,7 @@ public class SysController {
     }
 
     @PostMapping("/user")
-    public Integer saveUser(SysUser user, @Param("roleId") Long roleId) {
+    public Integer saveUser(SysUser user, @RequestParam("roleId") Long roleId) {
         Subject subject = SecurityUtils.getSubject();
 
         // 默认密码
@@ -142,6 +142,63 @@ public class SysController {
         return 1;
     }
 
+    @PutMapping("/user")
+    public Integer modifyUser(SysUser user, @RequestParam("roleId") Long roleId) {
+        SysUser temp = sysUserJpa.findOne(user.getId());
+
+        temp.setName(user.getName());
+        temp.setTel(user.getTel());
+        temp.setEmail(user.getEmail());
+        temp.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
+        if (roleId != null){
+            SysRole role = new SysRole();
+            role.setId(roleId);
+            temp.setRoles(new ArrayList(){
+                {
+                    this.add(role);
+                }
+            });
+        }
+
+        temp = sysUserJpa.save(temp);
+        if (temp == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    /**
+     * 密码重置
+     *
+     * @param userId
+     * @return
+     */
+    @PutMapping("/userPwd")
+    public Integer modifyUser(@RequestParam("id") Long userId) {
+        SysUser temp = sysUserJpa.findOne(userId);
+        temp.setPassword("123456");
+        passwordHelper.encryptPassword(temp);
+
+        temp = sysUserJpa.save(temp);
+        if (temp == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @Transactional
+    @DeleteMapping("/user")
+    public Integer deleteUser(@RequestBody List<Long> ids) {
+        sysUserJpa.deleteByIdIn(ids);
+
+        return 1;
+    }
+
+
 
     @PostMapping("/roleList")
     public List<SysRole> roleList() {
@@ -166,7 +223,7 @@ public class SysController {
 
     @PutMapping("/role")
     public Integer modifyRole(SysRole role) {
-        SysRole oldRole = sysRoleJpa.findById(role.getId());
+        SysRole oldRole = sysRoleJpa.findOne(role.getId());
         oldRole.setName(role.getName());
         oldRole.setCode(role.getCode());
         oldRole.setComment(role.getComment());

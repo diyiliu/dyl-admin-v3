@@ -25,16 +25,10 @@
             <div class="search-block" id="search-block">
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
-                        <div class="col-sm-3 col-md-2">
-                            <input type="text" class="form-control" placeholder="用户名" data-toggle="completer"
-                                   data-suggest="true"
-                                   data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
-                        </div>
                         <div class="col-sm-6 col-md-4">
-                            <div class="input-group">
-                            </div>
+                            <input type="text" class="form-control" placeholder="登录名/用户名" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
                         </div>
-                        <div class="col-sm-3 col-md-2 col-md-offset-4">
+                        <div class="col-sm-2 col-sm-offset-4 col-md-1 col-md-offset-7">
                             <button type="submit" class="btn btn-primary btn-block">查询</button>
                         </div>
                     </div>
@@ -199,16 +193,19 @@
                         title: '重置密码',
                         align: 'center',
                         formatter: function (value, row, index) {
-                            return '<a href="#" title="重置密码"><span class="sf-lock" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
+                            return '<a href="javascript:void(0);" onclick="resetPwd(this);" data-id="' + row.id + '" title="重置密码"><span class="sf-lock" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
                         }
                     }
                 ]
             });
 
             $('#addUser').on('click', function () {
+                $('#selRole').chosen("destroy");
                 $('#userForm')[0].reset();
 
                 $('#userModalTitle').html('添加用户');
+                $('#id').val('');
+                document.getElementById('username').readOnly = false;
                 $('#userModal').modal('show');
                 $('#selRole').chosen();
 
@@ -250,6 +247,8 @@
 
                     return;
                 }
+
+                // 重置表单
                 $('#selRole').chosen("destroy");
                 $('#userForm')[0].reset();
 
@@ -266,7 +265,7 @@
 
                 var role = user['roles'][0];
                 if (role) {
-                    var roleId = ['id'];
+                    var roleId = role.id;
                     var options = document.getElementById('selRole').options;
                     for (var i = 0; i < options.length; i++) {
                         var o = options[i];
@@ -277,14 +276,84 @@
                 }
 
                 $('#selRole').chosen();
-
                 laydate.render({
                     elem: '#expireTime'
                     , type: 'datetime'
                     , value: user['expireTime']
                 });
             });
+
+            $('#delUser').on('click', function () {
+                var users = $table.bootstrapTable('getSelections');
+                if (users.length < 1){
+                    swal("请至少选择一个用户进行删除!");
+
+                    return;
+                }
+                // 提示
+                swal({
+                        title: "确定删除选中用户?",
+                        text: "删除后将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#e67e22",
+                        confirmButtonText: "删除",
+                        closeOnConfirm: true
+                    },
+                    function(){
+                        var idArr = [];
+                        for (var i = 0; i < users.length; i++){
+                            idArr[i] = users[i]['id'];
+                        }
+                        $.ajax({
+                            type: 'delete',
+                            url: /*[[@{/sys/user}]]*/,
+                            contentType:"application/json;charset=utf-8",
+                            data: JSON.stringify(idArr),
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    $('#userModal').modal('hide');
+                                    $('#userTable').bootstrapTable('refresh');
+
+                                    alertTip('success', '删除成功');
+                                } else {
+                                    alertTip('error', '删除失败');
+                                }
+                            }
+                        });
+                    });
+            });
         });
+
+        function resetPwd(a) {
+            var id = $(a).data('id');
+            // 提示
+            swal({
+                    title: "重置用户密码?",
+                    text: "重置后原密码将无法使用",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#e67e22",
+                    confirmButtonText: "重置",
+                    closeOnConfirm: true
+                },
+                function(){
+                    $.ajax({
+                        type: 'put',
+                        url: /*[[@{/sys/userPwd}]]*/,
+                        data: {"id": id},
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 1) {
+                                alertTip('success', '重置密码成功');
+                            } else {
+                                alertTip('error', '重置密码失败');
+                            }
+                        }
+                    });
+                });
+        };
     </script>
 </div>
 </body>

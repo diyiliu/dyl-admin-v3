@@ -157,6 +157,7 @@
 
             $('#addRole').on('click', function () {
                 $('#roleForm')[0].reset();
+                $('#id').val('');
 
                 $('#roleModalTitle').html('添加角色');
                 $('#roleModal').modal('show');
@@ -211,7 +212,7 @@
                 // 提示
                 swal({
                         title: "确定删除选中角色?",
-                        text: "删除后将无法恢复!",
+                        text: "删除后将无法恢复",
                         type: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#e67e22",
