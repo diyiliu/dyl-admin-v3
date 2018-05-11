@@ -6,9 +6,9 @@ import com.diyiliu.support.shiro.filter.FormLoginFilter;
 import com.diyiliu.support.shiro.helper.PasswordHelper;
 import com.diyiliu.support.shiro.matcher.RetryCredentialsMatcher;
 import com.diyiliu.support.shiro.realm.UserRealm;
-import com.diyiliu.web.sys.facade.SysUserJpa;
+import com.diyiliu.web.sys.facade.SysAssetJpa;
 import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
-import com.diyiliu.web.sys.facade.SysRoleJpa;
+import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -42,10 +42,10 @@ public class ShiroConfig {
     private SysUserJpa sysUserJpa;
 
     @Resource
-    private SysRoleJpa sysRoleJpa;
+    private SysPrivilegeJpa sysPrivilegeJpa;
 
     @Resource
-    private SysPrivilegeJpa sysPrivilegeJpa;
+    private SysAssetJpa sysAssetJpa;
 
     @Autowired
     private ShiroProperties shiroProperties;
@@ -55,15 +55,18 @@ public class ShiroConfig {
      * 密码重试
      *
      * @param cacheManager
-     * @param sysUserJpa
      * @return
      */
     @Bean
-    public RetryCredentialsMatcher retryCredentialsMatcher(SpringCacheManager cacheManager, SysUserJpa sysUserJpa) {
-        RetryCredentialsMatcher matcher = new RetryCredentialsMatcher(cacheManager, sysUserJpa);
+    public RetryCredentialsMatcher retryCredentialsMatcher(SpringCacheManager cacheManager) {
+        RetryCredentialsMatcher matcher = new RetryCredentialsMatcher(cacheManager);
         matcher.setHashAlgorithmName(shiroProperties.getHashAlgorithmName());
         matcher.setHashIterations(shiroProperties.getHashIterations());
         matcher.setStoredCredentialsHexEncoded(true);
+
+        matcher.setSysUserJpa(sysUserJpa);
+        matcher.setSysAssetJpa(sysAssetJpa);
+        matcher.setSysPrivilegeJpa(sysPrivilegeJpa);
 
         return matcher;
     }
@@ -84,7 +87,6 @@ public class ShiroConfig {
         userRealm.setCredentialsMatcher(retryCredentialsMatcher);
 
         userRealm.setSysUserJpa(sysUserJpa);
-        userRealm.setSysRoleJpa(sysRoleJpa);
         userRealm.setSysPrivilegeJpa(sysPrivilegeJpa);
 
         return userRealm;

@@ -2,7 +2,7 @@
 /* sys_asset 系统资源                                           */
 /*==============================================================*/
 INSERT INTO sys_asset (id, name, code, pid, type, controller, view, icon_css, is_menu, sort)
-VALUES (1, '首页', 'home', 0 , 'menu', '', 'index', 'sf-house', 1, 1);
+VALUES (1, '首页', 'index', 0 , 'menu', '', 'index', 'sf-house', 1, 1);
 
 INSERT INTO sys_asset (id, name, code, pid, type, controller, view, icon_css, is_menu, sort)
 VALUES (2, '海洋浮球', 'buoy', 0 , 'node', '', '', 'sf-compass', 1, 2);

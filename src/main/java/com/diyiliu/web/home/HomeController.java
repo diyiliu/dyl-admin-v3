@@ -2,7 +2,6 @@ package com.diyiliu.web.home;
 
 import com.diyiliu.web.sys.dto.SysAsset;
 import com.diyiliu.web.sys.facade.SysAssetJpa;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -16,9 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Description: HomeController
@@ -64,26 +60,8 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(HttpSession session){
-        // 所有菜单节点
-        List<SysAsset> assetList = sysAssetJpa.findByIsMenuOrderByPidAscSortAsc(1);
-        // 根节点
-        List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
-        // 子节点
-        Map<Long, List<SysAsset>> menuMap = assetList.stream().filter(a -> a.getPid() > 0)
-                .collect(Collectors.groupingBy(SysAsset::getPid));
-
-        for (SysAsset asset: rootList){
-            long id = asset.getId();
-            if ("node".equals(asset.getType()) || menuMap.containsKey(id)){
-                List<SysAsset> children = menuMap.get(id);
-                if (CollectionUtils.isNotEmpty(children)){
-                    asset.setChildren(children);
-                }
-            }
-        }
-
-        session.setAttribute("menus", rootList);
-        session.setAttribute("active", rootList.get(0));
+        SysAsset asset = sysAssetJpa.findByCode("index");
+        session.setAttribute("active", asset);
 
         return "index";
     }

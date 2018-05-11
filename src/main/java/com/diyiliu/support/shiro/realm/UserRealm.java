@@ -4,7 +4,6 @@ import com.diyiliu.web.sys.dto.SysPrivilege;
 import com.diyiliu.web.sys.dto.SysRole;
 import com.diyiliu.web.sys.dto.SysUser;
 import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
-import com.diyiliu.web.sys.facade.SysRoleJpa;
 import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -27,8 +26,6 @@ import java.util.stream.Collectors;
 public class UserRealm extends AuthorizingRealm {
 
     private SysUserJpa sysUserJpa;
-
-    private SysRoleJpa sysRoleJpa;
 
     private SysPrivilegeJpa sysPrivilegeJpa;
 
@@ -80,10 +77,6 @@ public class UserRealm extends AuthorizingRealm {
 
     public void setSysUserJpa(SysUserJpa sysUserJpa) {
         this.sysUserJpa = sysUserJpa;
-    }
-
-    public void setSysRoleJpa(SysRoleJpa sysRoleJpa) {
-        this.sysRoleJpa = sysRoleJpa;
     }
 
     public void setSysPrivilegeJpa(SysPrivilegeJpa sysPrivilegeJpa) {
