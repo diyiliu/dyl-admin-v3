@@ -64,26 +64,26 @@
                     <ul class="dropdown-menu">
                         <li class="disabled text-center">
                             <a style="cursor:default;">
-                                <strong>John Smith</strong>
+                                <strong th:text="${session.user.username}">Diyiliu</strong>
                             </a>
                         </li>
                         <li class="divider"></li>
                         <li>
                             <a href="#">
                                 <i class="fa fa-fw fa-user"></i>
-                                Profile
+                                用户信息
                             </a>
                         </li>
                         <li>
-                            <a href="#">
-                                <i class="fa fa-fw fa-cog"></i>
-                                Settings
+                            <a href="#pwdModal" data-toggle="modal">
+                                <i class="fa fa-fw fa-lock"></i>
+                                修改密码
                             </a>
                         </li>
                         <li>
-                            <a href="login.html">
+                            <a href="#" th:href="@{/logout}">
                                 <i class="fa fa-fw fa-sign-out"></i>
-                                Sign out
+                                安全退出
                             </a>
                         </li>
                     </ul>
@@ -91,6 +91,48 @@
             </nav>
             <nav layout:fragment="header-nav"></nav>
         </header>
+        <div id="pwdModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">×</span></button>
+                        <h5 class="modal-title" id="userModalTitle">
+                            修改密码
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="userForm">
+                            <input type="hidden" id="id" name="id">
+                            <div class="form-group">
+                                <label for="oldPwd" class="col-sm-2 control-label">原密码</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="oldPwd" placeholder="原密码">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPwd" class="col-sm-2 control-label">新密码</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="newPwd" placeholder="新密码">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPwd2" class="col-sm-2 control-label">确认密码</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="newPwd2" placeholder="确认密码">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="savePwd">保存</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
         <div id="global">
             <!-- 内容区域 -->
             <div layout:fragment="content"></div>
@@ -111,6 +153,39 @@
         <script th:src="@{/static/plugin/chosen/chosen.jquery.js}"></script>
         <script th:src="@{/static/js/clearmin.js}"></script>
         <script th:src="@{/static/js/dyl.plugin.js}"></script>
+        <script th:inline="javascript">
+            $('#savePwd').on('click', function () {
+                var newPwd = $('#newPwd').val();
+                var newPwd2 = $('#newPwd2').val();
+                if (newPwd != newPwd2){
+                    swal("确认密码不一致!");
+                    return;
+                }
+
+                var oldPwd = $('#oldPwd').val();
+                var param = {
+                    "oldPwd": oldPwd,
+                    "newPwd": newPwd
+                };
+                $.ajax({
+                    type: 'put',
+                    url: /*[[@{/sys/userPwd}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (data) {
+                        var rs = data['result'];
+                        var msg = data['msg'];
+                        if (rs == 1) {
+                            $('#pwdModal').modal('hide');
+
+                            alertTip('success', msg);
+                        } else {
+                            alertTip('error', msg);
+                        }
+                    }
+                });
+            });
+        </script>
         <div layout:fragment="myJs"></div>
     </body>
 </html>

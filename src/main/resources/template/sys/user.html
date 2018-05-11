@@ -339,10 +339,10 @@
                     closeOnConfirm: true
                 },
                 function(){
+                    var path = /*[[@{/sys/userPwd/}]]*/;
                     $.ajax({
                         type: 'put',
-                        url: /*[[@{/sys/userPwd}]]*/,
-                        data: {"id": id},
+                        url: path + id,
                         dataType: "json",
                         success: function (result) {
                             if (result == 1) {

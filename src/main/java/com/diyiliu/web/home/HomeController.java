@@ -3,6 +3,7 @@ package com.diyiliu.web.home;
 import com.diyiliu.web.sys.dto.SysAsset;
 import com.diyiliu.web.sys.facade.SysAssetJpa;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -93,5 +94,12 @@ public class HomeController {
         session.setAttribute("active", asset);
 
         return asset.getView();
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        SecurityUtils.getSubject().logout();
+
+        return "redirect:/login";
     }
 }

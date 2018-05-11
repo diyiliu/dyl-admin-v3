@@ -16,11 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -169,14 +167,22 @@ public class SysController {
         return 1;
     }
 
+    @Transactional
+    @DeleteMapping("/user")
+    public Integer deleteUser(@RequestBody List<Long> ids) {
+        sysUserJpa.deleteByIdIn(ids);
+
+        return 1;
+    }
+
     /**
      * 密码重置
      *
      * @param userId
      * @return
      */
-    @PutMapping("/userPwd")
-    public Integer modifyUser(@RequestParam("id") Long userId) {
+    @PutMapping("/userPwd/{id}")
+    public Integer resetPwd(@PathVariable("id") Long userId) {
         SysUser temp = sysUserJpa.findOne(userId);
         temp.setPassword("123456");
         passwordHelper.encryptPassword(temp);
@@ -190,14 +196,39 @@ public class SysController {
         return 1;
     }
 
-    @Transactional
-    @DeleteMapping("/user")
-    public Integer deleteUser(@RequestBody List<Long> ids) {
-        sysUserJpa.deleteByIdIn(ids);
 
-        return 1;
+    @PutMapping("/userPwd")
+    public Map modifyPwd(@RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,
+                         HttpSession session) {
+        SysUser current = (SysUser) session.getAttribute("user");
+        SysUser temp = sysUserJpa.findOne(current.getId());
+
+        Map respMap = new HashMap();
+
+        String enPwd = passwordHelper.encryptPassword(temp.getUsername(), oldPwd, temp.getSalt());
+        if (enPwd.equals(temp.getPassword())){
+            temp.setPassword(newPwd);
+            passwordHelper.encryptPassword(temp);
+
+            temp = sysUserJpa.save(temp);
+            if (temp == null){
+
+                respMap.put("result", "0");
+                respMap.put("msg", "修改密码失败!");
+
+            }else {
+                respMap.put("result", "1");
+                respMap.put("msg", "修改密码成功!");
+            }
+
+            return respMap;
+        }
+
+        respMap.put("result", "0");
+        respMap.put("msg", "原密码错误!");
+
+        return respMap;
     }
-
 
 
     @PostMapping("/roleList")
