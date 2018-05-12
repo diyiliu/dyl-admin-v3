@@ -75,20 +75,16 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
 
     /**
      * 初始化菜单
+     *
      * @param username
      */
-    @Transactional
     private void loadData(String username){
         // 把用户信息放在session里
         Session session = SecurityUtils.getSubject().getSession();
         SysUser user = sysUserJpa.findByUsername(username);
 
         List<SysRole> roleList = user.getRoles();
-        Set roles = new HashSet();
-        for (SysRole role: roleList){
-            roles.add(role.getId());
-        }
-        //Set roles = roleList.stream().map(SysRole::getId).collect(Collectors.toSet());
+        Set roles = roleList.stream().map(SysRole::getId).collect(Collectors.toSet());
 
         List<SysPrivilege> privilegeList = sysPrivilegeJpa.findByMasterAndMasterValueIn("role", roles);
         Set assets = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toSet());

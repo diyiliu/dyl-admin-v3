@@ -137,14 +137,14 @@ public class SysController {
 
     @PutMapping("/user")
     public Integer modifyUser(SysUser user, @RequestParam("roleId") Long roleId) {
-        SysUser temp = sysUserJpa.findOne(user.getId());
+        SysUser temp = sysUserJpa.findById(user.getId());
 
         temp.setName(user.getName());
         temp.setTel(user.getTel());
         temp.setEmail(user.getEmail());
         temp.setExpireTime(DateUtil.stringToDate(user.getExpireTimeStr()));
         if (roleId != null) {
-            user.setRoleIds(new Long[]{roleId});
+            temp.setRoleIds(new Long[]{roleId});
         }
 
         temp = sysUserJpa.save(temp);
@@ -172,7 +172,7 @@ public class SysController {
      */
     @PutMapping("/userPwd/{id}")
     public Integer resetPwd(@PathVariable("id") Long userId) {
-        SysUser temp = sysUserJpa.findOne(userId);
+        SysUser temp = sysUserJpa.findById(userId);
         temp.setPassword("123456");
         passwordHelper.encryptPassword(temp);
 
@@ -190,7 +190,7 @@ public class SysController {
     public Map modifyPwd(@RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,
                          HttpSession session) {
         SysUser current = (SysUser) session.getAttribute("user");
-        SysUser temp = sysUserJpa.findOne(current.getId());
+        SysUser temp = sysUserJpa.findById(current.getId());
 
         Map respMap = new HashMap();
 
@@ -243,7 +243,7 @@ public class SysController {
 
     @PutMapping("/role")
     public Integer modifyRole(SysRole role) {
-        SysRole oldRole = sysRoleJpa.findOne(role.getId());
+        SysRole oldRole = sysRoleJpa.findById(role.getId());
         oldRole.setName(role.getName());
         oldRole.setCode(role.getCode());
         oldRole.setComment(role.getComment());

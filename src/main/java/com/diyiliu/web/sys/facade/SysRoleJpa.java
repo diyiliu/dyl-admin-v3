@@ -19,5 +19,7 @@ public interface SysRoleJpa extends JpaRepository<SysRole, Long> {
     List<SysRole> findByUser(String username);
 */
 
+    SysRole findById(long id);
+
     void deleteByIdIn(List<Long> ids);
 }

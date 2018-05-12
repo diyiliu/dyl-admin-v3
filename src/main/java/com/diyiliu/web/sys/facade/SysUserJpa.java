@@ -14,5 +14,7 @@ public interface SysUserJpa extends JpaRepository<SysUser, Long> {
 
     SysUser findByUsername(String username);
 
+    SysUser findById(long id);
+
     void deleteByIdIn(List<Long> ids);
 }
