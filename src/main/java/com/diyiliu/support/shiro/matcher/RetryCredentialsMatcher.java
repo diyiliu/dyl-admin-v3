@@ -79,14 +79,25 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
      * @param username
      */
     private void loadData(String username){
-        // 把用户信息放在session里
+
         Session session = SecurityUtils.getSubject().getSession();
         SysUser user = sysUserJpa.findByUsername(username);
+        // 把用户信息放在session里
+        session.setAttribute("user", user);
 
         List<SysRole> roleList = user.getRoles();
-        Set roles = roleList.stream().map(SysRole::getId).collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(roleList)){
+            // 未分配角色
+            return;
+        }
 
+        Set roles = roleList.stream().map(SysRole::getId).collect(Collectors.toSet());
         List<SysPrivilege> privilegeList = sysPrivilegeJpa.findByMasterAndMasterValueIn("role", roles);
+        if (CollectionUtils.isEmpty(privilegeList)){
+            // 无菜单权限
+            return;
+        }
+
         Set assets = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toSet());
         Set nodes = sysAssetJpa.findByChildren(assets);
         // 查询出的结果为Integer, 需要转Long
@@ -107,8 +118,6 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
                 }
             }
         }
-
-        session.setAttribute("user", user);
         // 初始化菜单
         session.setAttribute("menus", rootList);
     }
