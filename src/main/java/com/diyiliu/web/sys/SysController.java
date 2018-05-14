@@ -11,8 +11,12 @@ import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
 import com.diyiliu.web.sys.facade.SysRoleJpa;
 import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +35,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/sys")
 public class SysController {
+    private final static Integer PAGE_SIZE = 15;
+
 
     @Resource
     private SysAssetJpa sysAssetJpa;
@@ -155,10 +161,25 @@ public class SysController {
     }
 
     @PostMapping("/userList")
-    public List<SysUser> userList() {
-        Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "lastLoginTime")});
+    public Map userList(@RequestParam int pageNo, @RequestParam int pageSize,
+                        @RequestParam(required = false) String search) {
 
-        return sysUserJpa.findAll(sort);
+        Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "lastLoginTime")});
+        Pageable pageable = new PageRequest(pageNo - 1, pageSize, sort);
+
+        Page<SysUser> userPage;
+        if (StringUtils.isEmpty(search)) {
+            userPage = sysUserJpa.findAll(pageable);
+        } else {
+            String like = "%" + search + "%";
+            userPage = sysUserJpa.findByUsernameLikeOrNameLike(like, like, pageable);
+        }
+
+        Map respMap = new HashMap();
+        respMap.put("data", userPage.getContent());
+        respMap.put("total", userPage.getTotalElements());
+
+        return respMap;
     }
 
     @PostMapping("/user")

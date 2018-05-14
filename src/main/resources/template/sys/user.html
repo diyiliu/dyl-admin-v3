@@ -26,10 +26,12 @@
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
                         <div class="col-sm-6 col-md-4">
-                            <input type="text" class="form-control" placeholder="登录名/用户名" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                            <input type="text" class="form-control" placeholder="登录名/用户名" id="search"
+                                   data-toggle="completer" data-suggest="true"
+                                   data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
                         </div>
                         <div class="col-sm-2 col-sm-offset-4 col-md-1 col-md-offset-7">
-                            <button type="submit" class="btn btn-primary btn-block">查询</button>
+                            <button type="submit" class="btn btn-primary btn-block" id="doSearch">查询</button>
                         </div>
                     </div>
                 </form>
@@ -120,14 +122,35 @@
 
             var $table = $('#userTable');
             $table.bootstrapTable({
+                // 条纹
+                striped: true,
                 height: tableHeight,
+                toolbar: '#toolbar',
+                pagination: true,
+                paginationLoop: false,
                 sidePagination: 'server',
                 url: /*[[@{/sys/userList}]]*/,
                 method: 'post',
-                toolbar: '#toolbar',
-                // toolbarAlign: 'right',
-                // 条纹
-                striped: true,
+                contentType: "application/x-www-form-urlencoded",
+                dataField: "data",
+                queryParamsType: '',
+                queryParams: function queryParams(params) {
+                    var param = {
+                        pageNo: params.pageNumber,
+                        pageSize: params.pageSize,
+                        search: $('#search').val()
+                    };
+                    return param;
+                },
+                formatLoadingMessage: function () {
+                    return "正在加载数据中，请稍候……"
+                },
+                formatShowingRows: function (a, b, c) {
+                    return "第 " + a + " / " + b + " 条，共 " + c + " 条 ";
+                },
+                formatRecordsPerPage: function (a) {
+                    return "每页 " + a;
+                },
                 columns: [
                     {
                         field: '',
@@ -197,6 +220,10 @@
                         }
                     }
                 ]
+            });
+
+            $('#doSearch').on('click', function () {
+                $table.bootstrapTable("refresh");
             });
 
             $('#addUser').on('click', function () {
@@ -285,7 +312,7 @@
 
             $('#delUser').on('click', function () {
                 var users = $table.bootstrapTable('getSelections');
-                if (users.length < 1){
+                if (users.length < 1) {
                     swal("请至少选择一个用户进行删除!");
 
                     return;
@@ -300,15 +327,15 @@
                         confirmButtonText: "删除",
                         closeOnConfirm: true
                     },
-                    function(){
+                    function () {
                         var idArr = [];
-                        for (var i = 0; i < users.length; i++){
+                        for (var i = 0; i < users.length; i++) {
                             idArr[i] = users[i]['id'];
                         }
                         $.ajax({
                             type: 'delete',
                             url: /*[[@{/sys/user}]]*/,
-                            contentType:"application/json;charset=utf-8",
+                            contentType: "application/json;charset=utf-8",
                             data: JSON.stringify(idArr),
                             dataType: "json",
                             success: function (result) {
@@ -338,7 +365,7 @@
                     confirmButtonText: "重置",
                     closeOnConfirm: true
                 },
-                function(){
+                function () {
                     var path = /*[[@{/sys/userPwd/}]]*/;
                     $.ajax({
                         type: 'put',
