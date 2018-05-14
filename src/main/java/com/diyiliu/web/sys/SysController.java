@@ -10,6 +10,7 @@ import com.diyiliu.web.sys.facade.SysAssetJpa;
 import com.diyiliu.web.sys.facade.SysPrivilegeJpa;
 import com.diyiliu.web.sys.facade.SysRoleJpa;
 import com.diyiliu.web.sys.facade.SysUserJpa;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.data.domain.Sort;
@@ -67,10 +68,28 @@ public class SysController {
 
         List treeList = new ArrayList();
         for (SysAsset asset : rootList) {
-            treeList.add(toTree("home", asset, menuMap, list));
+            loadAsset(asset, menuMap);
+            treeList.add(toTree("home", asset, list));
         }
 
         return treeList;
+    }
+
+    /**
+     * 加载数枝干
+     *
+     * @param asset
+     * @param menuMap
+     */
+    private void loadAsset(SysAsset asset, Map<Long, List<SysAsset>> menuMap) {
+        long id = asset.getId();
+        if (menuMap.containsKey(id)) {
+            List<SysAsset> list = menuMap.get(id);
+            asset.setChildren(list);
+            for (SysAsset a : list) {
+                loadAsset(a, menuMap);
+            }
+        }
     }
 
     /**
@@ -78,24 +97,20 @@ public class SysController {
      *
      * @param code
      * @param sysAsset
-     * @param menuMap
      * @return
      */
-    private Map toTree(String code, SysAsset sysAsset, Map<Long, List<SysAsset>> menuMap, List<Long> ownList) {
+    private Map toTree(String code, SysAsset sysAsset, List<Long> ownList) {
         Map map = sysAsset.toTreeItem(code, ownList);
 
-        long id = sysAsset.getId();
-        if (menuMap.containsKey(id)) {
+        if (CollectionUtils.isNotEmpty(sysAsset.getChildren())) {
             map.put("open", 1);
             map.put("checkbox", "hidden");
 
             List items = new ArrayList();
-            List<SysAsset> list = menuMap.get(id);
+            List<SysAsset> list = sysAsset.getChildren();
             for (SysAsset asset : list) {
                 String parentCode = sysAsset.getCode();
-
-                items.add(asset.toTreeItem(parentCode, ownList));
-                toTree(parentCode, asset, menuMap, ownList);
+                items.add(toTree(parentCode, asset, ownList));
             }
             map.put("items", items);
         }
@@ -103,6 +118,41 @@ public class SysController {
         return map;
     }
 
+
+    @PostMapping("/asset")
+    public Integer saveAsset(SysAsset asset) {
+        asset = sysAssetJpa.save(asset);
+        if (asset == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @PutMapping("/asset")
+    public Integer modifyAsset(SysAsset asset) {
+        asset = sysAssetJpa.save(asset);
+        if (asset == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @PostMapping("/asset/{id}")
+    public SysAsset asset(@PathVariable("id") long id) {
+        return sysAssetJpa.findById(id);
+    }
+
+    @Transactional
+    @DeleteMapping("/asset")
+    public Integer deleteAsset(@RequestBody List<Long> ids) {
+        sysAssetJpa.deleteByIdIn(ids);
+
+        return 1;
+    }
 
     @PostMapping("/userList")
     public List<SysUser> userList() {

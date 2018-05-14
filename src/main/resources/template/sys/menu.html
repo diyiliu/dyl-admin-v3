@@ -7,9 +7,11 @@
     <title>帝一流</title>
     <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
     <link th:href="@{/static/plugin/treegrid/css/jquery.treegrid.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/plugin/treeview/dhtmlxtreeview.css}" type="text/css" rel="stylesheet">
+
 </head>
 <body>
-<div  layout:fragment="cm-flex" class="cm-flex">
+<div layout:fragment="cm-flex" class="cm-flex">
     <div class="cm-breadcrumb-container">
         <ol class="breadcrumb">
             <li><a href="#">系统管理</a></li>
@@ -28,21 +30,120 @@
                 <button type="button" class="btn btn-default" id="editMenu"><i class="fa fa-fw fa-pencil"></i></button>
                 <button type="button" class="btn btn-default" id="delMenu"><i class="fa fa-fw fa-trash-o"></i></button>
             </div>
-            <table id="menu-table"></table>
+            <table id="menuTable"></table>
         </div>
     </div>
 </div>
 <div layout:fragment="myJs">
+    <div id="menuModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                    <h5 class="modal-title" id="menuModalTitle">
+                        添加资源
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" id="menuForm">
+                        <div class="form-group">
+                            <input type="hidden" id="id" name="id">
+                            <label for="pid" class="col-sm-2 control-label">父节点</label>
+                            <div class="col-sm-10">
+                                <input type="hidden" id="pid" name="pid" value="0">
+                                <input type="hidden" id="pids" name="pids" value="0">
+                                <div style="position: relative;">
+                                    <input type="text" readonly class="form-control  dropdown-toggle" id="pNode"
+                                           placeholder="父节点" data-toggle="dropdown" aria-haspopup="true"
+                                           aria-expanded="true">
+                                    <div class="dropdown-menu form-control" aria-labelledby="pNode" id="treeDrop">
+                                        <div id="menuTree" class="modal-tree"
+                                             style="height: 280px;border: 0px;box-shadow: none;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="type" class="col-sm-2 control-label">资源类型</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="type" name="type">
+                                    <option value="menu">菜单</option>
+                                    <option value="node">节点</option>
+                                    <option value="button">按钮</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-2 control-label">资源名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="资源名称">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="code" class="col-sm-2 control-label">资源代码</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="code" name="code" placeholder="资源代码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sort" class="col-sm-2 control-label">排序</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="sort" name="sort" placeholder="排序">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="controller" class="col-sm-2 control-label">控制器</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="controller" name="controller"
+                                       placeholder="控制器">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="view" class="col-sm-2 control-label">视图</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="view" name="view" placeholder="视图">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="iconCss" class="col-sm-2 control-label">图标样式</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="iconCss" name="iconCss" placeholder="图标样式">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="code" class="col-sm-2 control-label">导航菜单</label>
+                            <div class="col-sm-10">
+                                <input type="hidden" id="isMenu" value="0" name="isMenu">
+                                <div class="form-control" style="border: 0px;box-shadow: none">
+                                    <a href="#" id="isNav"><img th:src="@{/static/img/sf/switch-off.svg}" height="24"
+                                                                width="24"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveMenu">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <script th:src="@{/static/js/jquery-migrate-1.2.1.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
     <script th:src="@{/static/plugin/treegrid/js/bootstrap-table-treegrid.js}"></script>
     <script th:src="@{/static/plugin/treegrid/js/jquery.treegrid.js}"></script>
+    <script th:src="@{/static/plugin/treeview/dhtmlxtreeview.min.js}"></script>
     <script th:inline="javascript">
         $(function () {
             var autoHeight = $("div.auto-height").height();
             var tableHeight = autoHeight - 0;
 
-            var $table = $('#menu-table');
+            var $table = $('#menuTable');
             $table.bootstrapTable({
                 height: tableHeight,
                 sidePagination: 'server',
@@ -65,7 +166,18 @@
                         field: 'type',
                         title: '类型',
                         align: 'center',
-                        formatter: 'typeFormatter'
+                        formatter: function (value) {
+                            if (value === 'menu') {
+                                return '菜单';
+                            }
+                            if (value === 'button') {
+                                return '按钮';
+                            }
+                            if (value === 'node') {
+                                return '节点';
+                            }
+                            return '-';
+                        }
                     },
                     {
                         field: 'controller',
@@ -79,12 +191,10 @@
                         field: 'isMenu',
                         title: '导航菜单',
                         align: 'center',
-                        formatter: function (v) {
-                            if (v == 1){
-
+                        formatter: function (value) {
+                            if (value == 1) {
                                 return '是';
                             }
-
                             return '否';
                         }
                     },
@@ -96,7 +206,10 @@
                         field: 'iconCss',
                         title: '图标',
                         align: 'center',
-                        formatter: 'iconFormatter'
+                        formatter: function (value) {
+                            return '<span class="' + value + '" style="display: inline-block;' +
+                                'width: 16px;height: 16px;background-size: 16px 16px;"></span>';
+                        }
                     }
                 ],
                 treeShowField: 'name',
@@ -110,28 +223,183 @@
                     });
                 }
             });
+
+            $('#menuTree').on('click', function (e) {
+                var oEvent = e || event;
+                oEvent.cancelBubble = true;
+                oEvent.stopPropagation();
+
+                return false;
+            });
+
+            var myTreeView;
+            $('#menuModal').on('show.bs.modal', function () {
+                var pid = $('#pid').val();
+                if (pid) {
+                    var url = /*[[@{/sys/asset/}]]*/;
+                    $.ajax({
+                        type: 'post',
+                        url: url + pid,
+                        dataType: "json",
+                        success: function (result) {
+                            if (result){
+                                $('#pNode').val(result['name']);
+                            }
+                        }
+                    });
+                }
+
+                var path = /*[[@{/sys/assetTree/}]]*/;
+                myTreeView = new dhtmlXTreeView({
+                    parent: "menuTree",
+                    json: path + 0,
+                });
+                myTreeView.attachEvent("onClick", function (id, state) {
+                    var pids = myTreeView.getUserData(id, 'pids');
+                    var text = this.getItemText(id);
+                    $('#pNode').val(text);
+                    $('#pid').val(id);
+                    $('#pids').val(pids + "/" + id);
+
+                    $('#treeDrop').dropdown('toggle');
+                });
+            });
+
+            $('#addMenu').on('click', function () {
+                $('#menuModalTitle').html('添加资源');
+                $('#menuForm')[0].reset();
+                $('#id').val('');
+                $('#pid').val(0);
+                $('#pNode').val('');
+                $('#isMenu').val(0);
+                $('#isNav').find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
+                $('#menuModal').modal('show');
+            });
+
+            $('#type').on('change', function () {
+                var sel = $(this).children('option:selected').val();
+                // node节点只存在导航菜单
+                if (sel == 'node') {
+                    $('#pNode').val('');
+                    $('#pid').val(0);
+                }
+            });
+
+            var i = 1;
+            $('#isNav').toggle(function () {
+                $(this).find('img').attr('src', /*[[@{/static/img/sf/switch-on.svg}]]*/);
+                $('#isMenu').val(i++ % 2);
+            }, function () {
+                $(this).find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
+                $('#isMenu').val(i++ % 2);
+            });
+
+            $('#saveMenu').on('click', function () {
+                var param = $('#menuForm').serialize();
+                $.ajax({
+                    type: $('#id').val() == '' ? 'post' : 'put',
+                    url: /*[[@{/sys/asset}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (result) {
+                        if (result == 1) {
+                            $('#menuModal').modal('hide');
+                            $('#menuTable').bootstrapTable('refresh');
+
+                            alertTip('success', '保存成功');
+                        } else {
+                            alertTip('error', '保存失败');
+                        }
+                    }
+                });
+            });
+
+            $('#editMenu').on('click', function () {
+                var menus = $table.bootstrapTable('getSelections');
+                if (menus.length != 1) {
+                    swal("请选择一个资源进行修改!");
+
+                    return;
+                }
+
+                // 重置表单
+                $('#menuForm')[0].reset();
+                var menu = menus[0];
+                $('#id').val(menu['id']);
+                $('#name').val(menu['name']);
+                $('#code').val(menu['code']);
+                $('#pid').val(menu['pid']);
+                $('#pids').val(menu['pids']);
+
+                $('#sort').val(menu['sort']);
+                $('#controller').val(menu['controller']);
+                $('#view').val(menu['view']);
+                $('#iconCss').val(menu['iconCss']);
+
+                // 下拉选中
+                var options = document.getElementById('type').options;
+                for (var i = 0; i < options.length; i++) {
+                    var o = options[i];
+                    if (o.value == menu['type']) {
+                        o.selected = true;
+                    }
+                }
+
+                // 是否导航 选项
+                if (menu['isMenu'] == 1) {
+                    $('#isMenu').val(1);
+                    $('#isNav').find('img').attr('src', /*[[@{/static/img/sf/switch-on.svg}]]*/);
+                }else {
+                    $('#isNav').find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
+                    $('#isMenu').val(0);
+                }
+
+                $('#menuModalTitle').html('修改资源');
+                $('#menuModal').modal('show');
+            });
+
+            $('#delMenu').on('click', function () {
+                var menus = $table.bootstrapTable('getSelections');
+                if (menus.length < 1){
+                    swal("请至少选择一个资源进行删除!");
+
+                    return;
+                }
+                // 提示
+                swal({
+                        title: "确定删除选中资源?",
+                        text: "删除后将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#e67e22",
+                        confirmButtonText: "删除",
+                        closeOnConfirm: true
+                    },
+                    function(){
+                        var idArr = [];
+                        for (var i = 0; i < menus.length; i++){
+                            idArr[i] = menus[i]['id'];
+                        }
+                        $.ajax({
+                            type: 'delete',
+                            url: /*[[@{/sys/asset}]]*/,
+                            contentType:"application/json;charset=utf-8",
+                            data: JSON.stringify(idArr),
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    $('#menuModal').modal('hide');
+                                    $('#menuTable').bootstrapTable('refresh');
+
+                                    alertTip('success', '删除成功');
+                                } else {
+                                    alertTip('error', '删除失败');
+                                }
+                            }
+                        });
+                    });
+            });
         });
-
-        // 格式化类型
-        function typeFormatter(value, row, index) {
-            if (value === 'menu') {
-                return '菜单';
-            }
-            if (value === 'button') {
-                return '按钮';
-            }
-            if (value === 'node') {
-                return '节点';
-            }
-            return '-';
-        }
-
-        // 格式化图标
-        function iconFormatter(value, row, index) {
-            return '<span class="' + value + '" ' +
-                'style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
-        }
-
     </script>
 </div>
 </body>

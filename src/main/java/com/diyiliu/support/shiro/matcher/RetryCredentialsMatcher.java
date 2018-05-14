@@ -17,11 +17,7 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.session.Session;
 
-import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -79,7 +75,6 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
      * @param username
      */
     private void loadData(String username){
-
         Session session = SecurityUtils.getSubject().getSession();
         SysUser user = sysUserJpa.findByUsername(username);
         // 把用户信息放在session里
@@ -99,12 +94,18 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
         }
 
         Set assets = privilegeList.stream().map(SysPrivilege::getAccessValue).collect(Collectors.toSet());
-        Set nodes = sysAssetJpa.findByChildren(assets);
-        // 查询出的结果为Integer, 需要转Long
-        nodes.forEach(e -> assets.add(Long.parseLong(String.valueOf(e))));
-
-        // 菜单节点
-        List<SysAsset> assetList = sysAssetJpa.findByIsMenuAndIdInOrderByPidAscSortAsc(1, assets);
+        // 权限节点(权限表中直接关联的节点)
+        List<SysAsset> parts = sysAssetJpa.findByIdIn(assets);
+        Set<Long> fulls = new HashSet();
+        fulls.addAll(assets);
+        for (SysAsset asset: parts){
+            String[] pids = asset.getPids().split("/");
+            for (String id: pids){
+                fulls.add(Long.parseLong(id));
+            }
+        }
+        // 完整节点(根据子节点查询所有上级节点)
+        List<SysAsset> assetList = sysAssetJpa.findByIsMenuAndIdInOrderByPidAscSortAsc(1, fulls);
         // 根节点
         List<SysAsset> rootList = assetList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
         // 子节点

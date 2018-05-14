@@ -25,9 +25,10 @@ create table rel_user_role
 create table sys_asset
 (
    id                   int not null auto_increment,
-   pid                  int comment '父ID',
    name                 varchar(50) comment '资源名称',
-   code                 varchar(50) comment '资源编码',
+   code                 varchar(50) comment '资源代码',
+   pid                  int comment '父ID',
+   pids                 varchar(80) comment '父节组ID',
    type                 varchar(50) comment '类型',
    controller           varchar(100)  comment '控制器',
    view                 varchar(100)  comment '视图',

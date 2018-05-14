@@ -19,10 +19,13 @@ public interface SysAssetJpa extends JpaRepository<SysAsset, Long> {
 
     List<SysAsset> findByIsMenuAndIdInOrderByPidAscSortAsc(int isMenu, Set ids);
 
+    List<SysAsset> findByIdIn(Set ids);
+
+    SysAsset findById(long id);
+
     SysAsset findByCode(String code);
 
     SysAsset findByController(String controller);
 
-    @Query(value = "select distinct t.id from sys_asset t inner join sys_asset c on c.pid = t.id and c.id in ?1", nativeQuery = true)
-    Set findByChildren(Set ids);
+    void deleteByIdIn(List<Long> ids);
 }

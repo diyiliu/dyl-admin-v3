@@ -22,11 +22,13 @@ public class SysAsset {
     @GeneratedValue
     private Long id;
 
-    private Long pid;
-
     private String name;
 
     private String code;
+
+    private Long pid;
+
+    private String pids;
     
     private String type;
 
@@ -62,7 +64,7 @@ public class SysAsset {
         Map data = new HashMap();
         data.put("access", type);
         data.put("permission", parentCode + ":" + code);
-
+        data.put("pids", pids);
         map.put("userdata", data);
 
         // 设置选中
