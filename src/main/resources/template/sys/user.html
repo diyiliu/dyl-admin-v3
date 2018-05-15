@@ -27,8 +27,7 @@
                     <div class="row">
                         <div class="col-sm-6 col-md-4">
                             <input type="text" class="form-control" placeholder="登录名/用户名" id="search"
-                                   data-toggle="completer" data-suggest="true"
-                                   data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                                   data-toggle="completer" data-suggest="true" th:attr="data-source=${#request.getAttribute('names')}">
                         </div>
                         <div class="col-sm-2 col-sm-offset-4 col-md-1 col-md-offset-7">
                             <button type="submit" class="btn btn-primary btn-block" id="doSearch">查询</button>
