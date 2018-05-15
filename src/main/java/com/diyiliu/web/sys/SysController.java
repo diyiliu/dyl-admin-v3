@@ -56,8 +56,9 @@ public class SysController {
 
     @PostMapping("/assetList")
     public List<SysAsset> assetList() {
+        Sort sort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
 
-        return sysAssetJpa.findAll();
+        return sysAssetJpa.findAll(sort);
     }
 
     @GetMapping("/assetTree/{roleId}")

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <meta charset="UTF-8">
+    <title>帝一流</title>
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
+</head>
+<body class="cm-no-transition cm-2-navbar">
+<h1 layout:fragment="header-title">网址导航</h1>
+<nav layout:fragment="header-nav" class="cm-navbar cm-navbar-default cm-navbar-slideup">
+    <div class="cm-flex">
+        <div class="nav-tabs-container">
+            <ul class="nav nav-tabs">
+                <li  class="active"><a href="#">网站列表</a></li>
+                <li><a href="#">网站排序</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div layout:fragment="content" class="container-fluid">
+    <div class="panel panel-default auto-height-tab">
+        <div class="panel-heading ">
+            网址信息
+        </div>
+        <div class="panel-body">
+            <form action="#" class="form-group form-horizontal">
+                <div class="row" id="site-search">
+                    <div class="col-sm-3 col-md-2">
+                        <input type="text" class="form-control" placeholder="浮标名称" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="gpsTime" placeholder="采集时间">
+                            <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="btnTime">
+                                             <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
+                                        </button>
+                                </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-md-2 col-md-offset-4">
+                        <button type="submit" class="btn btn-primary btn-block">查询</button>
+                    </div>
+                </div>
+            </form>
+            <table id="siteTable"></table>
+        </div>
+    </div>
+</div>
+<div layout:fragment="myJs">
+    <div id="siteModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h5 class="modal-title">
+                        添加网址
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="name" class="col-sm-2 control-label">名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="名称">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" class="col-sm-2 control-label">网址</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="url" name="url" placeholder="网址">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="selType" class="col-sm-2 control-label">分组</label>
+                            <div class="col-sm-10">
+                                <select id="selType" data-placeholder="选择角色 ..." name="type" class="form-control chosen-select">
+                                    <option value="0"></option>
+                                    <option value="1">综合</option>
+                                    <option value="2">购物</option>
+                                    <option value="3">设计</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveSite">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
+    <script th:inline="javascript">
+        $(function () {
+            var autoHeightTab = $("div.auto-height-tab").height();
+            var rowHeight = $('#site-search').height();
+            var tableHeight = autoHeightTab - (40 + rowHeight + 35);
+
+            var $table = $('#siteTable');
+            $table.bootstrapTable({
+                // 条纹
+                striped: true,
+                height: tableHeight,
+                pagination: true,
+                paginationLoop: false,
+                sidePagination: 'server',
+                url: /*[[@{/guide/list}]]*/,
+                method: 'post',
+                contentType: "application/x-www-form-urlencoded",
+                dataField: "data",
+                queryParamsType: '',
+                queryParams: function queryParams(params) {
+                    var param = {
+                        pageNo: params.pageNumber,
+                        pageSize: params.pageSize,
+                        search: $('#search').val()
+                    };
+                    return param;
+                },
+                formatLoadingMessage: function () {
+                    return "正在加载数据中，请稍候……"
+                },
+                formatShowingRows: function (a, b, c) {
+                    return "第 " + a + " / " + b + " 条，共 " + c + " 条 ";
+                },
+                formatRecordsPerPage: function (a) {
+                    return "每页 " + a;
+                },
+                columns: [
+                    {
+                        title: '序号',
+                        formatter: function (value, row, index) {
+                            return index + 1;
+                        }
+                    },
+                    {
+                        field: 'name',
+                        title: '名称'
+                    },
+                    {
+                        field: 'url',
+                        title: '网址'
+                    },
+                    {
+                        field: 'siteType',
+                        title: '分组',
+                        formatter: function (value, row, index) {
+
+                            return '';
+                        }
+                    },
+                    {
+                        field: 'image',
+                        title: '图标',
+                        formatter: function (value, row, index) {
+
+                            return '';
+                        }
+                    },
+                    {
+                        field: 'createTime',
+                        title: '创建时间'
+                    },
+                    {
+                        field: '',
+                        title: '操作',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            return '<a href="javascript:void(0);" onclick="resetPwd(this);" data-id="' + row.id + '" title="重置密码"><span class="sf-lock" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
+                        }
+                    }
+                ]
+            });
+
+            $('#doSearch').on('click', function () {
+                $table.bootstrapTable("refresh");
+            });
+
+            $('#addUser').on('click', function () {
+                $('#selRole').chosen("destroy");
+                $('#userForm')[0].reset();
+
+                $('#userModalTitle').html('添加用户');
+                $('#id').val('');
+                document.getElementById('username').readOnly = false;
+                $('#userModal').modal('show');
+                $('#selRole').chosen();
+
+                // 设置默认过期时间
+                var expire = new Date();
+                expire.setFullYear(expire.getFullYear() + 1);
+                expire.setDate(expire.getDate() - 1);
+                laydate.render({
+                    elem: '#expireTime'
+                    , type: 'datetime'
+                    , value: expire
+                });
+            });
+
+            $('#saveUser').on('click', function () {
+                var param = $('#userForm').serialize();
+                $.ajax({
+                    type: $('#id').val() == '' ? 'post' : 'put',
+                    url: /*[[@{/sys/user}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (result) {
+                        if (result == 1) {
+                            $('#userModal').modal('hide');
+                            $('#userTable').bootstrapTable('refresh');
+
+                            alertTip('success', '保存成功');
+                        } else {
+                            alertTip('error', '保存失败');
+                        }
+                    }
+                });
+            });
+
+            $('#editUser').on('click', function () {
+                var users = $table.bootstrapTable('getSelections');
+                if (users.length != 1) {
+                    swal("请选择一个用户进行修改!");
+
+                    return;
+                }
+
+                // 重置表单
+                $('#selRole').chosen("destroy");
+                $('#userForm')[0].reset();
+
+                var user = users[0];
+                $('#id').val(user['id']);
+                $('#username').val(user['username']);
+                $('#name').val(user['name']);
+                $('#tel').val(user['tel']);
+                $('#email').val(user['email']);
+
+                $('#userModalTitle').html('修改角色');
+                document.getElementById('username').readOnly = true;
+                $('#userModal').modal('show');
+
+                var role = user['roles'][0];
+                if (role) {
+                    var roleId = role.id;
+                    var options = document.getElementById('selRole').options;
+                    for (var i = 0; i < options.length; i++) {
+                        var o = options[i];
+                        if (o.value == roleId) {
+                            o.selected = true;
+                        }
+                    }
+                }
+
+                $('#selRole').chosen();
+                laydate.render({
+                    elem: '#expireTime'
+                    , type: 'datetime'
+                    , value: user['expireTime']
+                });
+            });
+
+            $('#delUser').on('click', function () {
+                var users = $table.bootstrapTable('getSelections');
+                if (users.length < 1) {
+                    swal("请至少选择一个用户进行删除!");
+
+                    return;
+                }
+                // 提示
+                swal({
+                        title: "确定删除选中用户?",
+                        text: "删除后将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#e67e22",
+                        confirmButtonText: "删除",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        var idArr = [];
+                        for (var i = 0; i < users.length; i++) {
+                            idArr[i] = users[i]['id'];
+                        }
+                        $.ajax({
+                            type: 'delete',
+                            url: /*[[@{/sys/user}]]*/,
+                            contentType: "application/json;charset=utf-8",
+                            data: JSON.stringify(idArr),
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    $('#userModal').modal('hide');
+                                    $('#userTable').bootstrapTable('refresh');
+
+                                    alertTip('success', '删除成功');
+                                } else {
+                                    alertTip('error', '删除失败');
+                                }
+                            }
+                        });
+                    });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

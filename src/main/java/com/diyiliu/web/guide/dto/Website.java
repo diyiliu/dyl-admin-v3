@@ -1,6 +1,7 @@
 package com.diyiliu.web.guide.dto;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Description: Website
@@ -26,7 +27,9 @@ public class Website {
     @JoinColumn(name = "type")
     private SiteType siteType;
 
-    private int top;
+    private int sort;
+
+    private Date createTime;
 
     public void setUrl(String url) {
         String regex = "[hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://|/+$";
@@ -69,11 +72,19 @@ public class Website {
         this.siteType = siteType;
     }
 
-    public int getTop() {
-        return top;
+    public int getSort() {
+        return sort;
     }
 
-    public void setTop(int top) {
-        this.top = top;
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

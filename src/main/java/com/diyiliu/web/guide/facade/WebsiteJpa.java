@@ -1,6 +1,8 @@
 package com.diyiliu.web.guide.facade;
 
 import com.diyiliu.web.guide.dto.Website;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -10,4 +12,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface WebsiteJpa extends JpaRepository<Website, Long> {
 
+    Page<Website> findByNameLikeOrUrlLike(String like1, String like2, Pageable pageable);
 }

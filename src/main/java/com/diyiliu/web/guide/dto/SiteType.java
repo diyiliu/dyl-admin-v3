@@ -1,5 +1,7 @@
 package com.diyiliu.web.guide.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -21,8 +23,9 @@ public class SiteType {
 
     private String name;
 
-    private int top;
+    private int sort;
 
+    @JsonIgnore
     @OrderBy("top asc ")
     @OneToMany(mappedBy = "siteType")
     private List<Website> siteList;
@@ -51,12 +54,13 @@ public class SiteType {
         this.name = name;
     }
 
-    public int getTop() {
-        return top;
+
+    public int getSort() {
+        return sort;
     }
 
-    public void setTop(int top) {
-        this.top = top;
+    public void setSort(int sort) {
+        this.sort = sort;
     }
 
     public List<Website> getSiteList() {
