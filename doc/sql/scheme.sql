@@ -94,3 +94,31 @@ create table sys_user
    last_login_time      datetime comment '最后登陆时间',
    primary key (id)
 );
+
+
+-- ----------------------------
+-- Table structure for guide_site
+-- ----------------------------
+DROP TABLE IF EXISTS `guide_site`;
+CREATE TABLE `guide_site` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(100) DEFAULT NULL,
+  `URL` varchar(200) DEFAULT NULL,
+  `IMAGE` varchar(200) DEFAULT NULL,
+  `TYPE` int(11) DEFAULT NULL,
+  `COMMENT` varchar(100) DEFAULT NULL,
+  `TOP` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8 COMMENT='网站地址';
+
+-- ----------------------------
+-- Table structure for guide_type
+-- ----------------------------
+DROP TABLE IF EXISTS `guide_type`;
+CREATE TABLE `guide_type` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `CODE` varchar(5) DEFAULT NULL,
+  `NAME` varchar(20) DEFAULT NULL,
+  `TOP` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='网址类型';

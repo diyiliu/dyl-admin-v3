@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>帝一流</title>
+    <link th:href="@{/static/plugin/guide/css/reset.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/guide/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div class="container">
+            <h1><a href="http://diyiliu.cc">DIYILIU</a></h1>
+            <form action="http://www.baidu.com/baidu" target="_blank" id="search-form">
+                <fieldset>
+                    <div class="rowElem">
+                        <input type="text" name="word">
+                        <a href="javascript:void(0);" onClick="document.getElementById('search-form').submit()">百度一下</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </header>
+    <div id="main" class="container">
+        <aside>
+            <h3>类别</h3>
+            <ul class="categories">
+                <li th:each="t,tStat:${typeList}"
+                    th:class="${tStat.index + 1 == tStat.size}? 'last': ''">
+                    <span></span><a href="javascript:void(0);" th:text="${t.getName()}"></a>
+                </li>
+            </ul>
+        </aside>
+
+        <section id="content">
+            <div class="inside">
+                <div class="site" th:each="t:${typeList}">
+                    <h2 th:utext="|${t.getName().substring(0, 1)}<span>${t.getName().substring(1)}</span>|"></h2>
+                    <ul>
+                        <li th:each="site:${t.getSiteList()}">
+                            <a target="_blank" th:href="|http://${site.url}|"
+                               th:utext="|<img src='@{/icon/{id}(id=${site.id})}' alt=''>${site.name}<span>百度一下，你就知道</span>|">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+    <footer>
+        <div class="container">
+            <div class="inside">
+                <p><a href="">Website</a> designed by Diyiliu.cc</p>
+                <p>Copyright © Diyiliu.cc 2.0 2018 All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

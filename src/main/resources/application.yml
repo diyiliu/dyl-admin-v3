@@ -42,13 +42,14 @@ logging:
 # shiro
 shiro:
   login-url: '/login'
-  success-url: '/'
+  success-url: '/console'
   hash-algorithm: MD5
   hash-iterations: 2
   username-param: username
   password-param: password
   remember-me-param: rememberMe
   filter-chain-definitions:
+    /: anon
     /login: authc
     /logout: anon
     /unauthorized: anon
