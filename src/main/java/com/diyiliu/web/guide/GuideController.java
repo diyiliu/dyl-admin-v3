@@ -5,8 +5,8 @@ import com.diyiliu.web.guide.dto.Website;
 import com.diyiliu.web.guide.facade.SiteTypeJpa;
 import com.diyiliu.web.guide.facade.WebsiteJpa;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 import java.io.*;
 import java.net.URI;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +51,11 @@ public class GuideController {
     @Resource
     private SiteTypeJpa siteTypeJpa;
 
-    @Autowired
+    @Resource
     private UploadProperties uploadProperties;
+
+    @Resource
+    private ResourceLoader resourceLoader;
 
     @PostMapping("/list")
     public Map siteList(@RequestParam int pageNo, @RequestParam int pageSize,
@@ -86,7 +90,7 @@ public class GuideController {
         } else {
             File tempFile = File.createTempFile("icon", ".png", uploadProperties.getImagePath().getFile());
             FileCopyUtils.copy(imgBytes, tempFile);
-            website.setImage("guide/image" + getFileRealName(tempFile.getName()));
+            website.setImage("guide/image/" + tempFile.getName());
         }
 
         website = websiteJpa.save(website);
@@ -126,7 +130,8 @@ public class GuideController {
         if ("unknown.png".equals(name)) {
             imgPath = uploadProperties.getUnknownImg();
         } else {
-            imgPath = null;
+            String path = uploadProperties.getImagePath().getURL().getPath();
+            imgPath = resourceLoader.getResource("file:" + Paths.get(path, name).toString());
         }
 
         if (imgPath != null) {
@@ -134,18 +139,6 @@ public class GuideController {
             FileCopyUtils.copy(imgPath.getInputStream(), response.getOutputStream());
         }
     }
-
-    /**
-     * 获取临时文件名
-     *
-     * @param name
-     * @return
-     */
-    private static String getFileRealName(String name) {
-
-        return name.substring(name.lastIndexOf("/"));
-    }
-
 
     /**
      * 抓取网站图标
@@ -198,6 +191,9 @@ public class GuideController {
                             if (!path.contains("//")) {
                                 path = scheme + "://" + location + path;
                             }
+                            if (!path.startsWith("http")) {
+                                path = scheme + ":" +  path;
+                            }
                             icoPath = path;
                             break;
                         }
@@ -207,21 +203,23 @@ public class GuideController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (icoPath == null) {
+            icoPath = "http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=" + location;
+        }
+        responseEntity = restTemplate.exchange(
+                icoPath,
+                HttpMethod.GET,
+                new HttpEntity<byte[]>(headers),
+                byte[].class);
 
-        if (icoPath != null) {
-            responseEntity = restTemplate.exchange(
-                    icoPath,
-                    HttpMethod.GET,
-                    new HttpEntity<byte[]>(headers),
-                    byte[].class);
-
-            statusCode = responseEntity.getStatusCode().value();
-            if (statusCode == 200) {
-                byte[] bytes = responseEntity.getBody();
+        statusCode = responseEntity.getStatusCode().value();
+        if (statusCode == 200) {
+            byte[] bytes = responseEntity.getBody();
+            // 默认图标
+            if (bytes.length != 726){
                 return bytes;
             }
         }
-
         return null;
     }
 }

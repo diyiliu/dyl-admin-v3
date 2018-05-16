@@ -27,19 +27,21 @@
             <ul class="categories">
                 <li th:each="t,tStat:${typeList}"
                     th:class="${tStat.index + 1 == tStat.size}? 'last': ''">
-                    <span></span><a href="javascript:void(0);" th:text="${t.getName()}"></a>
+                    <span></span><a th:href="${'#' + t.getId()}" th:text="${t.getName()}"></a>
                 </li>
             </ul>
         </aside>
 
         <section id="content">
             <div class="inside">
-                <div class="site" th:each="t:${typeList}">
+                <div class="site" th:each="t:${typeList}" th:id="${t.getId()}">
                     <h2 th:utext="|${t.getName().substring(0, 1)}<span>${t.getName().substring(1)}</span>|"></h2>
                     <ul>
                         <li th:each="site:${t.getSiteList()}">
-                            <a target="_blank" th:href="|http://${site.url}|"
-                               th:utext="|<img src='@{/icon/{id}(id=${site.id})}' alt=''>${site.name}<span>百度一下，你就知道</span>|">
+                            <a target="_blank" th:href="|http://${site.url}|">
+                                <img th:src="@{/{url}(url = ${site.image})}" alt="">
+                                <span th:text="${site.name}" class="site-name"></span>
+                                <span class="site-comment">百度一下，你就知道</span>
                             </a>
                         </li>
                     </ul>

@@ -25,11 +25,7 @@ body {
 }
 
 .wrap {
-    height: auto !important;
-    height: 100%;
-    min-height: 100%;
     background: url(../image/bg.jpg) repeat-y center top;
-    min-width: 940px;
 }
 
 #main {
@@ -181,8 +177,6 @@ section#content {
     overflow: hidden;
     text-decoration: none;
     font-style: normal;
-    font-weight: bold;
-    color: #30333C;
     background: rgba(192, 192, 192, 0.5);
     border: 1px solid #ffffff;
 }
@@ -201,7 +195,13 @@ section#content {
     left: 10px;
 }
 
-.site li a span {
+.site li a .site-name {
+    display: block;
+    font-weight: bold;
+    color: #30333C;
+}
+
+.site li a .site-comment {
     display: block;
     font-weight: normal;
     color: #A1A7B7;
@@ -210,11 +210,7 @@ section#content {
 footer {
     background: url(../image/bg-clear.png) repeat-y center top;
     min-width: 940px;
-    position: absolute;
-    /* 居中 */
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    margin-top: -120px;
 }
 
 footer .container {

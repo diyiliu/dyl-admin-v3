@@ -27,6 +27,8 @@ public class Website {
     @JoinColumn(name = "type")
     private SiteType siteType;
 
+    private String comment;
+
     private int sort;
 
     private Date createTime;
@@ -78,6 +80,14 @@ public class Website {
 
     public void setSort(int sort) {
         this.sort = sort;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public Date getCreateTime() {

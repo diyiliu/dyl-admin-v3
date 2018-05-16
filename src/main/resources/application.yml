@@ -50,6 +50,7 @@ shiro:
   remember-me-param: rememberMe
   filter-chain-definitions:
     /: anon
+    /guide/image/**: anon
     /login: authc
     /logout: anon
     /unauthorized: anon
