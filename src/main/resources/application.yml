@@ -57,3 +57,8 @@ shiro:
     /static/**: anon
     /authenticated: authc
     /**: user
+
+# 自定义属性
+upload:
+  image-path: file:./upload/image
+  unknown-img: file:./upload/unknown.png

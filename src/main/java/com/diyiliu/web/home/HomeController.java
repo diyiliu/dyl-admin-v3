@@ -1,12 +1,17 @@
 package com.diyiliu.web.home;
 
+import com.diyiliu.web.guide.dto.SiteType;
+import com.diyiliu.web.guide.facade.SiteTypeJpa;
 import com.diyiliu.web.sys.dto.SysAsset;
 import com.diyiliu.web.sys.facade.SysAssetJpa;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +20,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Description: HomeController
@@ -27,6 +34,9 @@ public class HomeController {
 
     @Resource
     private SysAssetJpa sysAssetJpa;
+
+    @Resource
+    private SiteTypeJpa siteTypeJpa;
 
     
     @GetMapping("/login")
@@ -79,5 +89,17 @@ public class HomeController {
         SecurityUtils.getSubject().logout();
 
         return "redirect:/login";
+    }
+
+
+    @GetMapping("/")
+    public String guide(Model model) {
+        Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
+        List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
+
+        List<SiteType> typeList = siteTypes.stream().filter(t -> CollectionUtils.isNotEmpty(t.getSiteList())).collect(Collectors.toList());
+        model.addAttribute("typeList", typeList);
+
+        return "guide";
     }
 }

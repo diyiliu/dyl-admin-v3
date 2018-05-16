@@ -14,4 +14,12 @@ public class TestMain {
 
         System.out.println(str.split("/")[1]);
     }
+
+
+    @Test
+    public void test1(){
+        String str = "guide/image/unknown.png";
+
+        System.out.println(str.substring(str.lastIndexOf("/")));
+    }
 }

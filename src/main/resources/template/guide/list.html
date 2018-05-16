@@ -27,30 +27,32 @@
 
 <div layout:fragment="content" class="container-fluid">
     <div class="panel panel-default auto-height-tab">
-        <div class="panel-heading ">
-            网址信息
-        </div>
         <div class="panel-body">
-            <form action="#" class="form-group form-horizontal">
-                <div class="row" id="site-search">
-                    <div class="col-sm-3 col-md-2">
-                        <input type="text" class="form-control" placeholder="浮标名称" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="gpsTime" placeholder="采集时间">
-                            <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" id="btnTime">
-                                             <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
-                                        </button>
-                                </span>
+            <div class="search-block" id="search-block">
+                <form action="#" class="form-group form-horizontal">
+                    <div class="row">
+                        <div class="col-sm-4 col-md-3">
+                            <select id="searchType" data-placeholder="选择分组 ..." name="type" class="form-control chosen-select">
+                                <option value=""></option>
+                                <option th:each="type:${#request.getAttribute('types')}" th:value="${type.id}"
+                                        th:text="${type.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <input type="text" class="form-control" placeholder="名称/网址" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                        </div>
+                        <div class="col-sm-2 col-md-1 col-md-offset-4">
+                            <button type="submit" class="btn btn-primary btn-block">查询</button>
                         </div>
                     </div>
-                    <div class="col-sm-3 col-md-2 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary btn-block">查询</button>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="btn-group" role="group" id="toolbar">
+                <button type="button" class="btn btn-default" id="addSite"><i class="fa fa-fw fa-plus"></i></button>
+                <button type="button" class="btn btn-default" id="editSite"><i class="fa fa-fw fa-pencil"></i></button>
+                <button type="button" class="btn btn-default" id="delSite"><i class="fa fa-fw fa-trash-o"></i></button>
+                <button type="button" class="btn btn-default" id="addType" title="添加分组"><i class="fa fa-fw fa-file-text-o"></i></button>
+            </div>
             <table id="siteTable"></table>
         </div>
     </div>
@@ -61,12 +63,13 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="siteModalTitle">
                         添加网址
                     </h5>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" id="siteForm">
+                        <input type="hidden" id="id" name="id">
                         <div class="form-group">
                             <label for="name" class="col-sm-2 control-label">名称</label>
                             <div class="col-sm-10">
@@ -82,12 +85,23 @@
                         <div class="form-group">
                             <label for="selType" class="col-sm-2 control-label">分组</label>
                             <div class="col-sm-10">
-                                <select id="selType" data-placeholder="选择角色 ..." name="type" class="form-control chosen-select">
-                                    <option value="0"></option>
-                                    <option value="1">综合</option>
-                                    <option value="2">购物</option>
-                                    <option value="3">设计</option>
+                                <select id="selType" data-placeholder="选择分组 ..." name="siteType.id" class="form-control chosen-select">
+                                    <option value=""></option>
+                                    <option th:each="type:${#request.getAttribute('types')}" th:value="${type.id}"
+                                            th:text="${type.name}"></option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sort" class="col-sm-2 control-label">排序</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="sort" name="sort" placeholder="排序">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment" class="col-sm-2 control-label">描述</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="comment" id="comment" rows="3"></textarea>
                             </div>
                         </div>
                     </form>
@@ -106,14 +120,15 @@
     <script th:inline="javascript">
         $(function () {
             var autoHeightTab = $("div.auto-height-tab").height();
-            var rowHeight = $('#site-search').height();
-            var tableHeight = autoHeightTab - (40 + rowHeight + 35);
+            var rowHeight = $('#search-block').height();
+            var tableHeight =  autoHeightTab - rowHeight - 40;
 
             var $table = $('#siteTable');
             $table.bootstrapTable({
                 // 条纹
                 striped: true,
                 height: tableHeight,
+                toolbar: '#toolbar',
                 pagination: true,
                 paginationLoop: false,
                 sidePagination: 'server',
@@ -141,10 +156,8 @@
                 },
                 columns: [
                     {
-                        title: '序号',
-                        formatter: function (value, row, index) {
-                            return index + 1;
-                        }
+                        field: 'ck',
+                        checkbox: true
                     },
                     {
                         field: 'name',
@@ -159,28 +172,27 @@
                         title: '分组',
                         formatter: function (value, row, index) {
 
-                            return '';
+                            return value.name;
                         }
+                    },
+                    {
+                        field: 'comment',
+                        title: '描述'
                     },
                     {
                         field: 'image',
                         title: '图标',
+                        align: 'center',
                         formatter: function (value, row, index) {
-
-                            return '';
+                            // 相对路径
+                            var path = /*[[@{/}]]*/;
+                            return '<img style="display: inline-block;width: 16px;height: 16px;" src=' + path + value + '>';
                         }
                     },
                     {
                         field: 'createTime',
-                        title: '创建时间'
-                    },
-                    {
-                        field: '',
-                        title: '操作',
-                        align: 'center',
-                        formatter: function (value, row, index) {
-                            return '<a href="javascript:void(0);" onclick="resetPwd(this);" data-id="' + row.id + '" title="重置密码"><span class="sf-lock" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
-                        }
+                        title: '创建时间',
+                        align: 'center'
                     }
                 ]
             });
@@ -189,38 +201,28 @@
                 $table.bootstrapTable("refresh");
             });
 
-            $('#addUser').on('click', function () {
-                $('#selRole').chosen("destroy");
-                $('#userForm')[0].reset();
+            $('#searchType').chosen();
+            $('#addSite').on('click', function () {
+                $('#selType').chosen("destroy");
+                $('#siteForm')[0].reset();
 
-                $('#userModalTitle').html('添加用户');
+                $('#siteModalTitle').html('添加网站');
                 $('#id').val('');
-                document.getElementById('username').readOnly = false;
-                $('#userModal').modal('show');
-                $('#selRole').chosen();
-
-                // 设置默认过期时间
-                var expire = new Date();
-                expire.setFullYear(expire.getFullYear() + 1);
-                expire.setDate(expire.getDate() - 1);
-                laydate.render({
-                    elem: '#expireTime'
-                    , type: 'datetime'
-                    , value: expire
-                });
+                $('#siteModal').modal('show');
+                $('#selType').chosen();
             });
 
-            $('#saveUser').on('click', function () {
-                var param = $('#userForm').serialize();
+            $('#saveSite').on('click', function () {
+                var param = $('#siteForm').serialize();
                 $.ajax({
                     type: $('#id').val() == '' ? 'post' : 'put',
-                    url: /*[[@{/sys/user}]]*/,
+                    url: /*[[@{/guide/site}]]*/,
                     data: param,
                     dataType: "json",
                     success: function (result) {
                         if (result == 1) {
-                            $('#userModal').modal('hide');
-                            $('#userTable').bootstrapTable('refresh');
+                            $('#siteModal').modal('hide');
+                            $('#siteTable').bootstrapTable('refresh');
 
                             alertTip('success', '保存成功');
                         } else {
@@ -230,59 +232,51 @@
                 });
             });
 
-            $('#editUser').on('click', function () {
-                var users = $table.bootstrapTable('getSelections');
-                if (users.length != 1) {
-                    swal("请选择一个用户进行修改!");
+            $('#editSite').on('click', function () {
+                var sites = $table.bootstrapTable('getSelections');
+                if (sites.length != 1) {
+                    swal("请选择一个网站进行修改!");
 
                     return;
                 }
 
                 // 重置表单
-                $('#selRole').chosen("destroy");
-                $('#userForm')[0].reset();
+                $('#selType').chosen("destroy");
+                $('#siteForm')[0].reset();
 
-                var user = users[0];
-                $('#id').val(user['id']);
-                $('#username').val(user['username']);
-                $('#name').val(user['name']);
-                $('#tel').val(user['tel']);
-                $('#email').val(user['email']);
+                var site = sites[0];
+                $('#id').val(site['id']);
+                $('#name').val(site['name']);
+                $('#url').val(site['url']);
 
-                $('#userModalTitle').html('修改角色');
-                document.getElementById('username').readOnly = true;
-                $('#userModal').modal('show');
+                $('#siteModalTitle').html('修改网站');
+                $('#siteModal').modal('show');
 
-                var role = user['roles'][0];
-                if (role) {
-                    var roleId = role.id;
-                    var options = document.getElementById('selRole').options;
+                var type = site['siteType'];
+                if (type) {
+                    var tpeId = type.id;
+                    var options = document.getElementById('selType').options;
                     for (var i = 0; i < options.length; i++) {
                         var o = options[i];
-                        if (o.value == roleId) {
+                        if (o.value == tpeId) {
                             o.selected = true;
                         }
                     }
                 }
 
-                $('#selRole').chosen();
-                laydate.render({
-                    elem: '#expireTime'
-                    , type: 'datetime'
-                    , value: user['expireTime']
-                });
+                $('#selType').chosen();
             });
 
-            $('#delUser').on('click', function () {
-                var users = $table.bootstrapTable('getSelections');
-                if (users.length < 1) {
-                    swal("请至少选择一个用户进行删除!");
+            $('#delSite').on('click', function () {
+                var sites = $table.bootstrapTable('getSelections');
+                if (sites.length < 1) {
+                    swal("请至少选择一个网站进行删除!");
 
                     return;
                 }
                 // 提示
                 swal({
-                        title: "确定删除选中用户?",
+                        title: "确定删除选中网站?",
                         text: "删除后将无法恢复",
                         type: "warning",
                         showCancelButton: true,
@@ -292,19 +286,19 @@
                     },
                     function () {
                         var idArr = [];
-                        for (var i = 0; i < users.length; i++) {
-                            idArr[i] = users[i]['id'];
+                        for (var i = 0; i < sites.length; i++) {
+                            idArr[i] = sites[i]['id'];
                         }
                         $.ajax({
                             type: 'delete',
-                            url: /*[[@{/sys/user}]]*/,
+                            url: /*[[@{/guide/site}]]*/,
                             contentType: "application/json;charset=utf-8",
                             data: JSON.stringify(idArr),
                             dataType: "json",
                             success: function (result) {
                                 if (result == 1) {
-                                    $('#userModal').modal('hide');
-                                    $('#userTable').bootstrapTable('refresh');
+                                    $('#siteModal').modal('hide');
+                                    $('#siteTable').bootstrapTable('refresh');
 
                                     alertTip('success', '删除成功');
                                 } else {
