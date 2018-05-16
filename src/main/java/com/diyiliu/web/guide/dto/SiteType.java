@@ -26,7 +26,7 @@ public class SiteType {
     private int sort;
 
     @JsonIgnore
-    @OrderBy("top asc ")
+    @OrderBy("sort asc")
     @OneToMany(mappedBy = "siteType")
     private List<Website> siteList;
 

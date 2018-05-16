@@ -41,7 +41,7 @@ public class GuideController {
 
     @GetMapping("/")
     public String guide(Model model) {
-        Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("top")});
+        Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
         List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
 
         List<SiteType> typeList = siteTypes.stream().filter(t -> CollectionUtils.isNotEmpty(t.getSiteList())).collect(Collectors.toList());
