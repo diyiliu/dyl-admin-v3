@@ -1,5 +1,8 @@
 package com.diyiliu.web.guide.dto;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -25,6 +28,7 @@ public class Website {
 
     @ManyToOne
     @JoinColumn(name = "type")
+    @NotFound(action = NotFoundAction.IGNORE)
     private SiteType siteType;
 
     private String comment;

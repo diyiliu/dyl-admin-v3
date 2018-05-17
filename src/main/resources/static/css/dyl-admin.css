@@ -81,6 +81,11 @@
     height: 400px;
 }
 
+.modal-tag .tagsinput{
+    border: 1px solid #dfdfdf;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.09);
+}
+
 /* 下拉选择框 */
 .chosen-container-single .chosen-single{
     height: 34px;

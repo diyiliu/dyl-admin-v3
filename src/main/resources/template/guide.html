@@ -39,7 +39,7 @@
                     <ul>
                         <li th:each="site:${t.getSiteList()}">
                             <a target="_blank" th:href="|http://${site.url}|">
-                                <img th:src="@{/{url}(url = ${site.image})}" alt="">
+                                <img th:src="@{/guide/image/{url}(url = ${site.image})}" alt="">
                                 <span th:text="${site.name}" class="site-name"></span>
                                 <span class="site-comment">百度一下，你就知道</span>
                             </a>

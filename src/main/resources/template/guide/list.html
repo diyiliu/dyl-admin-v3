@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>帝一流</title>
     <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/plugin/tagsinput/jquery.tagsinput.css}" type="text/css" rel="stylesheet">
 </head>
 <body class="cm-no-transition cm-2-navbar">
 <div layout:fragment="cm-flex" class="cm-flex">
@@ -127,7 +128,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="modal-tag">
-                        <input id="typeTag" type="text" class="tags" value="foo,bar,baz,roffle"/>
+                        <input id="typeTag" type="text" class="tags"/>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -140,7 +141,7 @@
         <!-- /.modal-dialog -->
     </div>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
-    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
+    <script th:src="@{/static/plugin/tagsinput/jquery.tagsinput.js}"></script>
     <script th:inline="javascript">
         $(function () {
             var autoHeightTab = $("div.auto-height-tab").height();
@@ -210,7 +211,7 @@
                         formatter: function (value, row, index) {
                             // 相对路径
                             var path = /*[[@{/}]]*/;
-                            return '<img style="display: inline-block;width: 16px;height: 16px;" src=' + path + value + '>';
+                            return '<img style="display: inline-block;width: 16px;height: 16px;" src=' + path + 'guide/image/' + value + '>';
                         }
                     },
                     {
@@ -232,6 +233,7 @@
 
                 $('#siteModalTitle').html('添加网站');
                 $('#id').val('');
+                document.getElementById('url').readOnly = false;
                 $('#siteModal').modal('show');
                 $('#selType').chosen();
             });
@@ -267,11 +269,14 @@
                 // 重置表单
                 $('#selType').chosen("destroy");
                 $('#siteForm')[0].reset();
+                document.getElementById('url').readOnly = true;
 
                 var site = sites[0];
                 $('#id').val(site['id']);
                 $('#name').val(site['name']);
                 $('#url').val(site['url']);
+                $('#sort').val(site['sort']);
+                $('#comment').val(site['comment']);
 
                 $('#siteModalTitle').html('修改网站');
                 $('#siteModal').modal('show');
@@ -333,9 +338,41 @@
                     });
             });
 
+            var typeNames = [[${#request.getAttribute('tNames')}]];
+            $('#typeTag').tagsInput({defaultText: '新增', width: 'auto', height: 260});
             $('#editType').on('click', function () {
-
+                $('#typeTag').importTags(typeNames);
                 $('#typeModal').modal('show');
+            });
+
+            $('#saveType').on('click', function () {
+                // 提示
+                swal({
+                        title: "确定修改网站分组?",
+                        text: "删除分组后的网站将无法显示",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#e67e22",
+                        confirmButtonText: "保存",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        $.ajax({
+                            type: 'put',
+                            url: /*[[@{/guide/type}]]*/,
+                            data: {typeNames: $('#typeTag').val()},
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    $('#typeModal').modal('hide');
+                                    alertTip('success', '保存成功');
+                                    location.reload();
+                                } else {
+                                    alertTip('error', '保存失败');
+                                }
+                            }
+                        });
+                    });
             });
         });
     </script>

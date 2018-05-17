@@ -15,6 +15,14 @@ import java.util.List;
 @Table(name = "guide_type")
 public class SiteType {
 
+    public SiteType() {
+
+    }
+
+    public SiteType(String name) {
+        this.name = name;
+    }
+
     @Id
     @GeneratedValue
     private int id;

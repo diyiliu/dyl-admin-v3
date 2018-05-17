@@ -18,5 +18,7 @@ public interface WebsiteJpa extends JpaRepository<Website, Long> {
 
     Website findById(long id);
 
+    List<Website> findByIdIn(List<Long> ids);
+
     void deleteByIdIn(List<Long> ids);
 }

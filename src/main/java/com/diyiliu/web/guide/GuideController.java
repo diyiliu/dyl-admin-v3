@@ -1,9 +1,12 @@
 package com.diyiliu.web.guide;
 
 import com.diyiliu.support.config.properties.UploadProperties;
+import com.diyiliu.web.guide.dto.SiteType;
 import com.diyiliu.web.guide.dto.Website;
 import com.diyiliu.web.guide.facade.SiteTypeJpa;
 import com.diyiliu.web.guide.facade.WebsiteJpa;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.ResourceLoader;
@@ -26,12 +29,10 @@ import java.io.*;
 import java.net.URI;
 import java.net.URLConnection;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Description: GuideController
@@ -40,6 +41,7 @@ import java.util.regex.Pattern;
  */
 
 
+@Slf4j
 @RestController
 @RequestMapping("/guide")
 @EnableConfigurationProperties(UploadProperties.class)
@@ -86,11 +88,11 @@ public class GuideController {
         // 抓取图片
         byte[] imgBytes = fetchICO(website.getUrl());
         if (imgBytes == null) {
-            website.setImage("guide/image/unknown.png");
+            website.setImage("unknown.png");
         } else {
             File tempFile = File.createTempFile("icon", ".png", uploadProperties.getImagePath().getFile());
             FileCopyUtils.copy(imgBytes, tempFile);
-            website.setImage("guide/image/" + tempFile.getName());
+            website.setImage(tempFile.getName());
         }
 
         website = websiteJpa.save(website);
@@ -106,6 +108,7 @@ public class GuideController {
     public Integer modifySite(Website website) {
         Website temp = websiteJpa.findById(website.getId());
 
+        website.setImage(temp.getImage());
         website.setCreateTime(temp.getCreateTime());
         website = websiteJpa.save(website);
         if (website == null) {
@@ -118,11 +121,56 @@ public class GuideController {
 
     @Transactional
     @DeleteMapping("/site")
-    public Integer deleteSite(@RequestBody List<Long> ids) {
-        websiteJpa.deleteByIdIn(ids);
+    public Integer deleteSite(@RequestBody List<Long> ids) throws IOException {
+        List<Website> list = websiteJpa.findByIdIn(ids);
+
+        // 删除文件
+        for (Website site : list) {
+            String imgPath = site.getImage();
+            if (StringUtils.isEmpty(imgPath) || "unknown.png".equals(imgPath)) {
+                continue;
+            }
+            org.springframework.core.io.Resource localRes = getLocalResource(site.getImage());
+            if (!localRes.getFile().delete()) {
+                log.error("删除文件[{}]失败!");
+            }
+        }
+
+        // 删除数据
+        websiteJpa.delete(list);
 
         return 1;
     }
+
+
+    @Transactional
+    @PutMapping("/type")
+    public Integer modifySiteType(@RequestParam("typeNames") String typeNames) {
+        String[] names = typeNames.split(",");
+        List<String> nameList = Arrays.asList(names);
+
+        List<SiteType> siteTypes = siteTypeJpa.findAll();
+        List<String> oldList = siteTypes.stream().map(SiteType::getName).collect(Collectors.toList());
+
+        // 新增
+        List<String> addTemps = (List<String>) CollectionUtils.subtract(nameList, oldList);
+        List<SiteType> list = new ArrayList();
+        for (String temp : addTemps) {
+            list.add(new SiteType(temp));
+        }
+
+        list = siteTypeJpa.save(list);
+        if (list == null) {
+            return 0;
+        }
+
+        // 删除
+        List<String> delTemps = (List<String>) CollectionUtils.subtract(oldList, nameList);
+        siteTypeJpa.deleteByNameIn(delTemps);
+
+        return 1;
+    }
+
 
     @RequestMapping(value = "/image/{name:.+}")
     public void uploadedImage(@PathVariable("name") String name, HttpServletResponse response) throws IOException {
@@ -130,14 +178,27 @@ public class GuideController {
         if ("unknown.png".equals(name)) {
             imgPath = uploadProperties.getUnknownImg();
         } else {
-            String path = uploadProperties.getImagePath().getURL().getPath();
-            imgPath = resourceLoader.getResource("file:" + Paths.get(path, name).toString());
+            imgPath = getLocalResource(name);
         }
 
         if (imgPath != null) {
             response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(imgPath.getFilename()));
             FileCopyUtils.copy(imgPath.getInputStream(), response.getOutputStream());
         }
+    }
+
+
+    /**
+     * 获取图片资源
+     *
+     * @param name
+     * @return
+     * @throws IOException
+     */
+    private org.springframework.core.io.Resource getLocalResource(String name) throws IOException {
+        String path = uploadProperties.getImagePath().getURL().getPath();
+
+        return resourceLoader.getResource("file:" + Paths.get(path, name).toString());
     }
 
     /**
@@ -192,7 +253,7 @@ public class GuideController {
                                 path = scheme + "://" + location + path;
                             }
                             if (!path.startsWith("http")) {
-                                path = scheme + ":" +  path;
+                                path = scheme + ":" + path;
                             }
                             icoPath = path;
                             break;
@@ -216,7 +277,7 @@ public class GuideController {
         if (statusCode == 200) {
             byte[] bytes = responseEntity.getBody();
             // 默认图标
-            if (bytes.length != 726){
+            if (bytes.length != 726) {
                 return bytes;
             }
         }

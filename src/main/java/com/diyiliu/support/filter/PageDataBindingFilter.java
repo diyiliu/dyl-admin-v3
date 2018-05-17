@@ -63,6 +63,12 @@ public class PageDataBindingFilter {
         if ("guide".equals(menu)) {
             Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
             List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
+
+            StringBuilder strBuf = new StringBuilder();
+            for (SiteType type: siteTypes){
+                strBuf.append(",").append(type.getName());
+            }
+            request.setAttribute("tNames", strBuf.substring(1));
             request.setAttribute("types", siteTypes);
 
             return;
