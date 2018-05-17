@@ -40,10 +40,10 @@
                             </select>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <input type="text" class="form-control" placeholder="名称/网址" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                            <input type="text" class="form-control" id="search" placeholder="名称/网址" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
                         </div>
                         <div class="col-sm-2 col-md-1 col-md-offset-4">
-                            <button type="submit" class="btn btn-primary btn-block">查询</button>
+                            <button type="submit" class="btn btn-primary btn-block" id="doSearch">查询</button>
                         </div>
                     </div>
                 </form>
@@ -166,6 +166,7 @@
                     var param = {
                         pageNo: params.pageNumber,
                         pageSize: params.pageSize,
+                        typeId: $('#searchType').val(),
                         search: $('#search').val()
                     };
                     return param;

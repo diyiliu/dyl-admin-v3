@@ -19,30 +19,34 @@ public class SiteType {
 
     }
 
+    public SiteType(Long id) {
+        this.id = id;
+    }
+
     public SiteType(String name) {
         this.name = name;
     }
 
     @Id
     @GeneratedValue
-    private int id;
+    private Long id;
 
     private String code;
 
     private String name;
 
-    private int sort;
+    private Integer sort;
 
     @JsonIgnore
     @OrderBy("sort asc")
     @OneToMany(mappedBy = "siteType")
     private List<Website> siteList;
-
-    public int getId() {
+    
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -62,12 +66,11 @@ public class SiteType {
         this.name = name;
     }
 
-
-    public int getSort() {
+    public Integer getSort() {
         return sort;
     }
 
-    public void setSort(int sort) {
+    public void setSort(Integer sort) {
         this.sort = sort;
     }
 

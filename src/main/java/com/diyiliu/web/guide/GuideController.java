@@ -8,6 +8,7 @@ import com.diyiliu.web.guide.facade.WebsiteJpa;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.persistence.criteria.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.*;
@@ -61,17 +63,32 @@ public class GuideController {
 
     @PostMapping("/list")
     public Map siteList(@RequestParam int pageNo, @RequestParam int pageSize,
-                        @RequestParam(required = false) String search) {
-
+                        @RequestParam(required = false) String search, @RequestParam(required = false) Long typeId) {
         Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "createTime")});
         Pageable pageable = new PageRequest(pageNo - 1, pageSize, sort);
 
         Page<Website> sitePage;
-        if (StringUtils.isEmpty(search)) {
+        if (StringUtils.isEmpty(search) && typeId == null) {
             sitePage = websiteJpa.findAll(pageable);
         } else {
-            String like = "%" + search + "%";
-            sitePage = websiteJpa.findByNameLikeOrUrlLike(like, like, pageable);
+            sitePage = websiteJpa.findAll(
+                    (Root<Website> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+                        Path<String> nameExp = root.get("name");
+                        Path<String> urlExp = root.get("url");
+                        Path<SiteType> typeExp = root.get("siteType");
+
+                        Predicate predicate = null;
+                        if (StringUtils.isNotEmpty(search)) {
+                            String like = "%" + search + "%";
+                            predicate = cb.or(new Predicate[]{cb.like(nameExp, like), cb.like(urlExp, like)});
+                        }
+
+                        if (typeId != null) {
+                            predicate = cb.and(new Predicate[]{predicate, cb.equal(typeExp, new SiteType(typeId))});
+                        }
+
+                        return predicate;
+                    }, pageable);
         }
 
         Map respMap = new HashMap();
