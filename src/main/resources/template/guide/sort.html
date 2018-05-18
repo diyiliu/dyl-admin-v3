@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <meta charset="UTF-8">
+    <title>帝一流</title>
+    <link th:href="@{/static/plugin/nestable/nestable.css}" type="text/css" rel="stylesheet">
+</head>
+<body class="cm-no-transition cm-2-navbar">
+<div layout:fragment="cm-flex" class="cm-flex">
+    <h1>网址导航</h1>
+    <form id="cm-search" action="index.html" method="get">
+        <input type="search" name="q" autocomplete="off" placeholder="Search...">
+    </form>
+</div>
+<nav layout:fragment="header-nav" class="cm-navbar cm-navbar-default cm-navbar-slideup">
+    <div class="cm-flex">
+        <div class="nav-tabs-container">
+            <ul class="nav nav-tabs">
+                <li><a th:href="@{/home/guide}">网站列表</a></li>
+                <li class="active"><a th:href="@{/home/guide.1}">网站排序</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div layout:fragment="content" class="container-fluid">
+    <div class="panel panel-default auto-height-tab">
+        <div class="panel-heading ">
+            分组信息
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-1 col-sm-offset-11">
+                    <button type="button" class="btn btn-primary btn-block" id="saveSort">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div layout:fragment="myJs">
+    <script th:src="@{/static/plugin/nestable/jquery.nestable.js}"></script>
+    <script th:inline="javascript">
+        $(function () {
+
+
+        });
+    </script>
+</div>
+</body>
+</html>

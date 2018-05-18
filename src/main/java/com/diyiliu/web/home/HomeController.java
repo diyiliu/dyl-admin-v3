@@ -38,9 +38,9 @@ public class HomeController {
     @Resource
     private SiteTypeJpa siteTypeJpa;
 
-    
+
     @GetMapping("/login")
-    public String login(){
+    public String login() {
 
         return "login";
     }
@@ -69,17 +69,24 @@ public class HomeController {
     }
 
     @GetMapping("/console")
-    public String index(HttpSession session){
+    public String index(HttpSession session) {
         SysAsset asset = sysAssetJpa.findByCode("index");
         session.setAttribute("active", asset);
 
         return "index";
     }
 
-    @GetMapping("/home/{menu}")
-    public String show(@PathVariable("menu") String menu, HttpSession session){
+    @GetMapping("/home/{menu:.+}")
+    public String show(@PathVariable("menu") String menu, HttpSession session) {
         SysAsset asset = sysAssetJpa.findByController("home/" + menu);
         session.setAttribute("active", asset);
+
+        // 菜单页面的子页面
+        if (menu.contains(".")) {
+            menu = menu.split("\\.")[0];
+            SysAsset active = sysAssetJpa.findByController("home/" + menu);
+            session.setAttribute("active", active);
+        }
 
         return asset.getView();
     }

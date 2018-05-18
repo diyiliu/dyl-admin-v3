@@ -22,4 +22,13 @@ public class TestMain {
 
         System.out.println(str.substring(str.lastIndexOf("/")));
     }
+
+    @Test
+    public void test2(){
+        String str = "guide.1";
+
+        String[] arr = str.split("\\.");
+
+        System.out.println(arr.length);
+    }
 }
