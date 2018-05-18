@@ -19,7 +19,7 @@
     <div class="cm-flex">
         <div class="nav-tabs-container">
             <ul class="nav nav-tabs">
-                <li  class="active"><a href="#">网站列表</a></li>
+                <li class="active"><a href="#">网站列表</a></li>
                 <li><a href="#">网站排序</a></li>
             </ul>
         </div>
@@ -33,14 +33,17 @@
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
                         <div class="col-sm-4 col-md-3">
-                            <select id="searchType" data-placeholder="选择分组 ..." name="type" class="form-control chosen-select">
+                            <select id="searchType" data-placeholder="选择分组 ..." name="type"
+                                    class="form-control chosen-select">
                                 <option value=""></option>
                                 <option th:each="type:${#request.getAttribute('types')}" th:value="${type.id}"
                                         th:text="${type.name}"></option>
                             </select>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <input type="text" class="form-control" id="search" placeholder="名称/网址" data-toggle="completer" data-suggest="true" data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
+                            <input type="text" class="form-control" id="search" placeholder="名称/网址"
+                                   data-toggle="completer" data-suggest="true"
+                                   data-source="['PG3711981', 'PG3711982', 'PG3711983', 'PG3711984', 'PG3711985']">
                         </div>
                         <div class="col-sm-2 col-md-1 col-md-offset-4">
                             <button type="button" class="btn btn-primary btn-block" id="doSearch">查询</button>
@@ -52,7 +55,8 @@
                 <button type="button" class="btn btn-default" id="addSite"><i class="fa fa-fw fa-plus"></i></button>
                 <button type="button" class="btn btn-default" id="editSite"><i class="fa fa-fw fa-pencil"></i></button>
                 <button type="button" class="btn btn-default" id="delSite"><i class="fa fa-fw fa-trash-o"></i></button>
-                <button type="button" class="btn btn-default" id="editType" title="添加分组"><i class="fa fa-fw fa-file-text-o"></i></button>
+                <button type="button" class="btn btn-default" id="editType" title="添加分组"><i
+                        class="fa fa-fw fa-file-text-o"></i></button>
             </div>
             <table id="siteTable"></table>
         </div>
@@ -63,7 +67,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
                     <h5 class="modal-title" id="siteModalTitle">
                         添加网址
                     </h5>
@@ -86,7 +91,8 @@
                         <div class="form-group">
                             <label for="selType" class="col-sm-2 control-label">分组</label>
                             <div class="col-sm-10">
-                                <select id="selType" data-placeholder="选择分组 ..." name="siteType.id" class="form-control chosen-select">
+                                <select id="selType" data-placeholder="选择分组 ..." name="siteType.id"
+                                        class="form-control chosen-select">
                                     <option value=""></option>
                                     <option th:each="type:${#request.getAttribute('types')}" th:value="${type.id}"
                                             th:text="${type.name}"></option>
@@ -96,7 +102,8 @@
                         <div class="form-group">
                             <label for="sort" class="col-sm-2 control-label">排序</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="sort" name="sort" placeholder="排序" value="0">
+                                <input type="text" class="form-control" id="sort" name="sort" placeholder="排序"
+                                       value="0">
                             </div>
                         </div>
                         <div class="form-group">
@@ -146,7 +153,7 @@
         $(function () {
             var autoHeightTab = $("div.auto-height-tab").height();
             var rowHeight = $('#search-block').height();
-            var tableHeight =  autoHeightTab - rowHeight - 40;
+            var tableHeight = autoHeightTab - rowHeight - 40;
 
             var $table = $('#siteTable');
             $table.bootstrapTable({
@@ -227,7 +234,7 @@
                 $table.bootstrapTable("refresh");
             });
 
-            $('#searchType').chosen();
+            $('#searchType').chosen({allow_single_deselect: true});
             $('#addSite').on('click', function () {
                 $('#selType').chosen("destroy");
                 $('#siteForm')[0].reset();

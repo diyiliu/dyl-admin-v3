@@ -102,6 +102,9 @@
 .chosen-container-active.chosen-with-drop .chosen-single div b {
     background-position: -18px 6px;
 }
+.chosen-container-single .chosen-single abbr{
+    top: 10px;
+}
 .chosen-container-active .chosen-single{
     -webkit-box-shadow: none;
     box-shadow: none;

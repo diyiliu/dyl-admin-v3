@@ -82,7 +82,6 @@ public class GuideController {
                             Predicate predicate = cb.or(new Predicate[]{cb.like(nameExp, like), cb.like(urlExp, like)});
                             list.add(predicate);
                         }
-
                         if (typeId != null) {
                             Predicate predicate = cb.equal(typeExp, new SiteType(typeId));
                             list.add(predicate);
