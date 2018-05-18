@@ -8,7 +8,6 @@ import com.diyiliu.web.guide.facade.WebsiteJpa;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
@@ -77,17 +76,20 @@ public class GuideController {
                         Path<String> urlExp = root.get("url");
                         Path<SiteType> typeExp = root.get("siteType");
 
-                        Predicate predicate = null;
+                        List<Predicate> list = new ArrayList();
                         if (StringUtils.isNotEmpty(search)) {
                             String like = "%" + search + "%";
-                            predicate = cb.or(new Predicate[]{cb.like(nameExp, like), cb.like(urlExp, like)});
+                            Predicate predicate = cb.or(new Predicate[]{cb.like(nameExp, like), cb.like(urlExp, like)});
+                            list.add(predicate);
                         }
 
                         if (typeId != null) {
-                            predicate = cb.and(new Predicate[]{predicate, cb.equal(typeExp, new SiteType(typeId))});
+                            Predicate predicate = cb.equal(typeExp, new SiteType(typeId));
+                            list.add(predicate);
                         }
 
-                        return predicate;
+                        Predicate[] predicates = list.toArray(new Predicate[]{});
+                        return cb.and(predicates);
                     }, pageable);
         }
 
