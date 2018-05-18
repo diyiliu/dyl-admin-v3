@@ -60,16 +60,16 @@ public class PageDataBindingFilter {
             return;
         }
 
-        if ("guide".equals(menu)) {
+        if (menu.startsWith("guide")) {
             Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
             List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
-
-            StringBuilder strBuf = new StringBuilder();
-            for (SiteType type: siteTypes){
-                strBuf.append(",").append(type.getName());
-            }
-            request.setAttribute("tNames", strBuf.substring(1));
             request.setAttribute("types", siteTypes);
+
+            // 主页面 添加chosen
+            if (!menu.contains(".1")) {
+                List<String> names = siteTypes.stream().map(SiteType::getName).collect(Collectors.toList());
+                request.setAttribute("tNames", names);
+            }
 
             return;
         }

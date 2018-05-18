@@ -1,4 +1,10 @@
+import com.diyiliu.support.util.JacksonUtil;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Description: TestMain
@@ -30,5 +36,14 @@ public class TestMain {
         String[] arr = str.split("\\.");
 
         System.out.println(arr.length);
+    }
+
+    @Test
+    public void test3() throws IOException {
+        String str = "[{\"id\":29},{\"id\":28,\"children\":[{\"id\":28},{\"id\":28}]},{\"id\":30,\"children\":[{\"id\":30}]},{\"id\":4,\"children\":[{\"id\":4}]}]";
+
+        List list = JacksonUtil.toList(str, Map.class);
+
+        System.out.println(list.size());
     }
 }

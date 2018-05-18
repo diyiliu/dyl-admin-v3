@@ -36,6 +36,27 @@
                     <button type="button" class="btn btn-primary btn-block" id="saveSort">保存</button>
                 </div>
             </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="nestable">
+                            <div class="dd" id="nestable">
+                                <ol class="dd-list">
+                                    <li class="dd-item" th:each="type:${#request.getAttribute('types')}" th:attr="data-id=${type.id}">
+                                        <div class="dd-handle" th:text="${type.name}"></div>
+                                        <ol class="dd-list" th:if="${!#lists.isEmpty(type.siteList)}">
+                                            <li class="dd-item" th:each="site:${type.siteList}" th:attr="data-id=${site.id}">
+                                                <div class="dd-handle" th:text="${site.name}"></div>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -43,8 +64,46 @@
     <script th:src="@{/static/plugin/nestable/jquery.nestable.js}"></script>
     <script th:inline="javascript">
         $(function () {
+            var str = '';
+            var updateOutput = function(e)
+            {
+                var list   = e.length ? e : $(e.target);
+                str = JSON.stringify(list.nestable('serialize'));
+            };
 
+            $('#nestable').nestable({
+                group: 1
+            }).on('change', updateOutput);
+            updateOutput($('#nestable'));
 
+            $('#saveSort').on('click', function () {
+                // 提示
+                swal({
+                        title: "确认当前排列?",
+                        text: "保存后将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#e67e22",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        $.ajax({
+                            type: 'post',
+                            url: /*[[@{/guide/type}]]*/,
+                            contentType: "application/json;charset=utf-8",
+                            data: str,
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    alertTip('success', '保存成功');
+                                } else {
+                                    alertTip('error', '保存失败');
+                                }
+                            }
+                        });
+                    });
+            });
         });
     </script>
 </div>

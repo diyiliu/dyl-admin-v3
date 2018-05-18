@@ -187,6 +187,9 @@
                 formatRecordsPerPage: function (a) {
                     return "每页 " + a;
                 },
+                formatNoMatches: function () {
+                    return '没有找到匹配的数据';
+                },
                 columns: [
                     {
                         field: 'ck',
@@ -346,7 +349,8 @@
                     });
             });
 
-            var typeNames = [[${#request.getAttribute('tNames')}]];
+            // 字符串处理
+            var typeNames = [[${#strings.listJoin(#request.getAttribute('tNames'),',')}]];
             $('#typeTag').tagsInput({defaultText: '新增', width: 'auto', height: 260});
             $('#editType').on('click', function () {
                 $('#typeTag').importTags(typeNames);

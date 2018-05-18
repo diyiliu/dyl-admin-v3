@@ -1,6 +1,7 @@
 package com.diyiliu.web.guide;
 
 import com.diyiliu.support.config.properties.UploadProperties;
+import com.diyiliu.support.util.JacksonUtil;
 import com.diyiliu.web.guide.dto.SiteType;
 import com.diyiliu.web.guide.dto.Website;
 import com.diyiliu.web.guide.facade.SiteTypeJpa;
@@ -174,7 +175,9 @@ public class GuideController {
         List<String> addTemps = (List<String>) CollectionUtils.subtract(nameList, oldList);
         List<SiteType> list = new ArrayList();
         for (String temp : addTemps) {
-            list.add(new SiteType(temp));
+            SiteType type = new SiteType(temp);
+            type.setSort(100);
+            list.add(type);
         }
 
         list = siteTypeJpa.save(list);
@@ -185,6 +188,60 @@ public class GuideController {
         // 删除
         List<String> delTemps = (List<String>) CollectionUtils.subtract(oldList, nameList);
         siteTypeJpa.deleteByNameIn(delTemps);
+
+        return 1;
+    }
+
+
+    @PostMapping("/type")
+    public Integer saveSort(@RequestBody String json) throws Exception{
+        List list = JacksonUtil.toList(json, Map.class);
+        Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
+        List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
+        Map<Long, SiteType> typeMap = siteTypes.stream().collect(Collectors.toMap(SiteType::getId, type -> type));
+
+        List<SiteType> typeList = new ArrayList();
+        List<Website> siteList = new ArrayList();
+        for (int i = 0; i < list.size(); i++){
+            int sort = i + 1;
+            Map map = (Map) list.get(i);
+            long id = Long.parseLong(String.valueOf(map.get("id")));
+            if (typeMap.containsKey(id)){
+                SiteType type = typeMap.get(id);
+                if (type.getSort() != sort){
+                    type.setSort(sort);
+                    typeList.add(type);
+                }
+
+                List children = (List) map.get("children");
+                List<Website> sList = type.getSiteList();
+                if (CollectionUtils.isEmpty(children) || CollectionUtils.isEmpty(sList)){
+
+                    continue;
+                }
+
+                Map<Long, Website> siteMap = sList.stream().collect(Collectors.toMap(Website::getId, site -> site));
+                for (int j = 0; j < children.size(); j++){
+                    int top = j + 1;
+                    Map m = (Map) children.get(j);
+                    long key = Long.parseLong(String.valueOf(m.get("id")));
+                    if (siteMap.containsKey(key)){
+                        Website website = siteMap.get(key);
+                        if (website.getSort() != top){
+                            website.setSort(top);
+                            siteList.add(website);
+                        }
+                    }
+                }
+            }
+        }
+
+        List tList =  siteTypeJpa.save(typeList);
+        List sList =  websiteJpa.save(siteList);
+        if (tList == null || sList == null){
+
+            return 0;
+        }
 
         return 1;
     }

@@ -15,7 +15,6 @@ import java.util.List;
  * Update: 2016-03-22 9:25
  */
 public class JacksonUtil {
-
     private static ObjectMapper mapper = new ObjectMapper();
 
     private final static SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
