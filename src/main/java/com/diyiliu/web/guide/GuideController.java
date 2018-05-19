@@ -149,9 +149,12 @@ public class GuideController {
             if (StringUtils.isEmpty(imgPath) || "unknown.png".equals(imgPath)) {
                 continue;
             }
-            org.springframework.core.io.Resource localRes = getLocalResource(site.getImage());
-            if (!localRes.getFile().delete()) {
-                log.error("删除文件[{}]失败!");
+
+            org.springframework.core.io.Resource localRes = getLocalResource(imgPath);
+            if (localRes.exists()){
+                if (!localRes.getFile().delete()) {
+                    log.error("删除文件[{}]失败!");
+                }
             }
         }
 

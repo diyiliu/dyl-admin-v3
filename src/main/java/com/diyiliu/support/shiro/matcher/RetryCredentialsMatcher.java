@@ -12,6 +12,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
@@ -62,8 +63,16 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
             // 清除重试次数
             passwordRetryCache.remove(username);
 
+            // 把用户信息放在session里
+            Session session = SecurityUtils.getSubject().getSession();
+            SysUser user = sysUserJpa.findByUsername(username);
+            session.setAttribute("user", user);
+
             // 装载数据
-            loadData(username);
+            loadData(user, session);
+            // 记录登录信息
+            UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+            recordLogin(user, upToken.getHost());
         }
 
         return matches;
@@ -72,14 +81,9 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
     /**
      * 初始化菜单
      *
-     * @param username
+     * @param user
      */
-    private void loadData(String username){
-        Session session = SecurityUtils.getSubject().getSession();
-        SysUser user = sysUserJpa.findByUsername(username);
-        // 把用户信息放在session里
-        session.setAttribute("user", user);
-
+    private void loadData(SysUser user,  Session session){
         List<SysRole> roleList = user.getRoles();
         if (CollectionUtils.isEmpty(roleList)){
             // 未分配角色
@@ -122,6 +126,21 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
         // 初始化菜单
         session.setAttribute("menus", rootList);
     }
+
+    /**
+     * 记录用户登录
+     *
+     * @param user
+     * @param host
+     */
+    private void recordLogin(SysUser user, String host){
+        user.setLoginCount(user.getLoginCount() == null? 1: user.getLoginCount() + 1);
+        user.setLastLoginIp(host);
+        user.setLastLoginTime(new Date());
+
+        sysUserJpa.save(user);
+    }
+
 
     public void setSysUserJpa(SysUserJpa sysUserJpa) {
         this.sysUserJpa = sysUserJpa;
