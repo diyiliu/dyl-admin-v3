@@ -259,7 +259,7 @@ public class GuideController {
             imgPath = getLocalResource(name);
         }
 
-        if (imgPath != null) {
+        if (imgPath != null && imgPath.exists()) {
             response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(imgPath.getFilename()));
             FileCopyUtils.copy(imgPath.getInputStream(), response.getOutputStream());
         }
