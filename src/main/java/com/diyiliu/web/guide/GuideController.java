@@ -114,6 +114,11 @@ public class GuideController {
             website.setImage(tempFile.getName());
         }
 
+        // 未设置网站分组
+        if (website.getSiteType() != null && website.getSiteType().getId() == null) {
+            website.setSiteType(null);
+        }
+
         website = websiteJpa.save(website);
         if (website == null) {
 
@@ -151,7 +156,7 @@ public class GuideController {
             }
 
             org.springframework.core.io.Resource localRes = getLocalResource(imgPath);
-            if (localRes.exists()){
+            if (localRes.exists()) {
                 if (!localRes.getFile().delete()) {
                     log.error("删除文件[{}]失败!");
                 }
@@ -197,7 +202,7 @@ public class GuideController {
 
 
     @PostMapping("/type")
-    public Integer saveSort(@RequestBody String json) throws Exception{
+    public Integer saveSort(@RequestBody String json) throws Exception {
         List list = JacksonUtil.toList(json, Map.class);
         Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
         List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
@@ -205,32 +210,32 @@ public class GuideController {
 
         List<SiteType> typeList = new ArrayList();
         List<Website> siteList = new ArrayList();
-        for (int i = 0; i < list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             int sort = i + 1;
             Map map = (Map) list.get(i);
             long id = Long.parseLong(String.valueOf(map.get("id")));
-            if (typeMap.containsKey(id)){
+            if (typeMap.containsKey(id)) {
                 SiteType type = typeMap.get(id);
-                if (type.getSort() != sort){
+                if (type.getSort() != sort) {
                     type.setSort(sort);
                     typeList.add(type);
                 }
 
                 List children = (List) map.get("children");
                 List<Website> sList = type.getSiteList();
-                if (CollectionUtils.isEmpty(children) || CollectionUtils.isEmpty(sList)){
+                if (CollectionUtils.isEmpty(children) || CollectionUtils.isEmpty(sList)) {
 
                     continue;
                 }
 
                 Map<Long, Website> siteMap = sList.stream().collect(Collectors.toMap(Website::getId, site -> site));
-                for (int j = 0; j < children.size(); j++){
+                for (int j = 0; j < children.size(); j++) {
                     int top = j + 1;
                     Map m = (Map) children.get(j);
                     long key = Long.parseLong(String.valueOf(m.get("id")));
-                    if (siteMap.containsKey(key)){
+                    if (siteMap.containsKey(key)) {
                         Website website = siteMap.get(key);
-                        if (website.getSort() != top){
+                        if (website.getSort() != top) {
                             website.setSort(top);
                             siteList.add(website);
                         }
@@ -239,9 +244,9 @@ public class GuideController {
             }
         }
 
-        List tList =  siteTypeJpa.save(typeList);
-        List sList =  websiteJpa.save(siteList);
-        if (tList == null || sList == null){
+        List tList = siteTypeJpa.save(typeList);
+        List sList = websiteJpa.save(siteList);
+        if (tList == null || sList == null) {
 
             return 0;
         }
