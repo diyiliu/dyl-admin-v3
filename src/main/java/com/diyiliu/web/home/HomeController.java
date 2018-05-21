@@ -65,13 +65,11 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        return "home";
+        return "index";
     }
 
     @GetMapping("/console")
-    public String index(HttpSession session) {
-        SysAsset asset = sysAssetJpa.findByCode("index");
-        session.setAttribute("active", asset);
+    public String index() {
 
         return "index";
     }
@@ -79,16 +77,25 @@ public class HomeController {
     @GetMapping("/home/{menu:.+}")
     public String show(@PathVariable("menu") String menu, HttpSession session) {
         SysAsset asset = sysAssetJpa.findByController("home/" + menu);
-        session.setAttribute("active", asset);
+        if (asset == null) {
+            return "error/404";
+        }
+        String view = asset.getView();
 
         // 菜单页面的子页面
         if (menu.contains(".")) {
             menu = menu.split("\\.")[0];
-            SysAsset active = sysAssetJpa.findByController("home/" + menu);
-            session.setAttribute("active", active);
+            asset = sysAssetJpa.findByController("home/" + menu);
+
+            if (asset == null) {
+                return "error/404";
+            }
         }
 
-        return asset.getView();
+        // 设置当前页
+        session.setAttribute("active", asset);
+
+        return view;
     }
 
     @GetMapping("/logout")

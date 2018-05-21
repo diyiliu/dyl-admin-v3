@@ -125,6 +125,10 @@ public class RetryCredentialsMatcher extends HashedCredentialsMatcher {
         }
         // 初始化菜单
         session.setAttribute("menus", rootList);
+
+        // 设置当前页
+        SysAsset asset = sysAssetJpa.findByCode("index");
+        session.setAttribute("active", asset);
     }
 
     /**
