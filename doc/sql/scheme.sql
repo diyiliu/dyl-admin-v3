@@ -13,36 +13,6 @@ File Encoding         : 65001
 Date: 2018-05-19 23:20:57
 */
 
-SET FOREIGN_KEY_CHECKS=0;
-
--- ----------------------------
--- Table structure for guide_site
--- ----------------------------
-DROP TABLE IF EXISTS `guide_site`;
-CREATE TABLE `guide_site` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `NAME` varchar(100) DEFAULT NULL,
-  `URL` varchar(200) DEFAULT NULL,
-  `IMAGE` varchar(200) DEFAULT NULL,
-  `TYPE` int(11) DEFAULT NULL,
-  `COMMENT` varchar(100) DEFAULT NULL,
-  `SORT` int(11) DEFAULT NULL,
-  `CREATE_TIME` datetime DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8 COMMENT='网站地址';
-
--- ----------------------------
--- Table structure for guide_type
--- ----------------------------
-DROP TABLE IF EXISTS `guide_type`;
-CREATE TABLE `guide_type` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `CODE` varchar(5) DEFAULT NULL,
-  `NAME` varchar(20) DEFAULT NULL,
-  `SORT` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COMMENT='网址类型';
-
 -- ----------------------------
 -- Table structure for rel_user_role
 -- ----------------------------
@@ -125,3 +95,77 @@ CREATE TABLE `sys_user` (
   `last_login_time` datetime DEFAULT NULL COMMENT '最后登陆时间',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- 导航子系统
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for guide_site
+-- ----------------------------
+DROP TABLE IF EXISTS `guide_site`;
+CREATE TABLE `guide_site` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(100) DEFAULT NULL,
+  `URL` varchar(200) DEFAULT NULL,
+  `IMAGE` varchar(200) DEFAULT NULL,
+  `TYPE` int(11) DEFAULT NULL,
+  `COMMENT` varchar(100) DEFAULT NULL,
+  `SORT` int(11) DEFAULT NULL,
+  `CREATE_TIME` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8 COMMENT='网站地址';
+
+-- ----------------------------
+-- Table structure for guide_type
+-- ----------------------------
+DROP TABLE IF EXISTS `guide_type`;
+CREATE TABLE `guide_type` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `CODE` varchar(5) DEFAULT NULL,
+  `NAME` varchar(20) DEFAULT NULL,
+  `SORT` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COMMENT='网址类型';
+
+
+-- ----------------------------
+-- 库存子系统
+-- ----------------------------
+drop table if exists grain_member;
+
+/*==============================================================*/
+/* Table: grain_member                                          */
+/*==============================================================*/
+create table grain_member
+(
+  id                   int not null auto_increment,
+  name                 varchar(50) comment '姓名',
+  tel                  varchar(20) comment '电话',
+  address              varchar(100) comment '地址',
+  create_user          varchar(30) comment '创建人',
+  create_time          datetime comment '创建时间',
+  primary key (id)
+);
+
+drop table if exists grain_stock;
+
+/*==============================================================*/
+/* Table: grain_stock                                           */
+/*==============================================================*/
+create table grain_stock
+(
+  id                   int not null auto_increment,
+  book_no              int comment '账本号',
+  serial_no            varchar(30) comment '序列号',
+  gross                int comment '毛重',
+  tare                 int comment '皮重',
+  suttle               int comment '净重',
+  price                numeric(5,2) comment '单价',
+  money                numeric(8,1) comment '金额',
+  member_id            int comment '关系人',
+  create_time          datetime comment '创建时间',
+  pay_time             datetime comment '付款时间',
+  status               int comment '状态',
+  primary key (id)
+);
