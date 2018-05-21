@@ -105,7 +105,13 @@ public class GuideController {
         website.setCreateTime(new Date());
 
         // 抓取图片
-        byte[] imgBytes = fetchICO(website.getUrl());
+        byte[] imgBytes = null;
+        try {
+            imgBytes = fetchICO(website.getUrl());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (imgBytes == null) {
             website.setImage("unknown.png");
         } else {
