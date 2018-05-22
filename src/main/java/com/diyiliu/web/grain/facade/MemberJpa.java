@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface MemberJpa extends JpaRepository<Member, Long> {
 
+    Member findByNameAndTel(String name, String tel);
 }

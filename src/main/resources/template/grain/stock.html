@@ -45,6 +45,72 @@
     </div>
 </div>
 <div layout:fragment="myJs">
+    <div id="stockModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                    <h5 class="modal-title" id="stockModalTitle">
+                        添加库存
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" id="stockForm">
+                        <input type="hidden" id="id" name="id">
+                        <div class="form-group">
+                            <label for="bookNo" class="col-sm-2 control-label">账本号</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="bookNo" name="bookNo" placeholder="账本号">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="serialNo" class="col-sm-2 control-label">序列号</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="serialNo" name="serialNo" placeholder="序列号">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="name" name="member.name" placeholder="姓名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tel" class="col-sm-2 control-label">电话</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="tel" name="member.tel" placeholder="电话">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="gross" class="col-sm-2 control-label">毛重</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="gross" name="gross" placeholder="毛重">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tare" class="col-sm-2 control-label">去皮</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="tare" name="tare" placeholder="去皮">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="price" class="col-sm-2 control-label">单价</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="price" name="price" placeholder="单价">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveStock">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
     <script th:inline="javascript">
@@ -110,23 +176,49 @@
                     },
                     {
                         field: 'gross',
-                        title: '毛重'
+                        title: '毛重',
+                        align: 'right'
                     },
                     {
                         field: 'tare',
-                        title: '去皮'
+                        title: '去皮',
+                        align: 'right'
                     },
                     {
                         field: 'suttle',
-                        title: '净重'
+                        title: '净重 (kg)',
+                        align: 'center'
+                    },
+                    {
+                        field: 'price',
+                        title: '单价 (元/kg)',
+                        align: 'center'
+                    },
+                    {
+                        field: 'money',
+                        title: '金额 (元)',
+                        align: 'right',
+                        formatter: function (value, row, index) {
+                            value = value + '';
+                            if (value.indexOf('.') > 0){
+                                return value.split('.')[0];
+                            }
+
+                            return value;
+                        }
                     },
                     {
                         field: 'createTime',
-                        title: '创建时间'
-                    },
-                    {
-                        field: 'payTime',
-                        title: '付款时间'
+                        title: '创建时间',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var str = '';
+                            if (value) {
+                                str = value.substr(0, 10);
+                            }
+
+                            return '<span style="cursor: default" title="' + value + '">' + str + '</span>';
+                        }
                     },
                     {
                         field: 'status',
@@ -134,13 +226,47 @@
                         align: 'center',
                         formatter: function (value, row, index) {
                             if (1 == value) {
-                                return '<span class="sf-switch-on" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
+                                return '<span class="sf-sign-check" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
                             }
 
-                            return '<span class="sf-switch-off" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
+                            return '<span class="sf-light-bulb" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
                         }
                     }
                 ]
+            });
+
+            $('#doSearch').on('click', function () {
+                $table.bootstrapTable("refresh");
+            });
+
+            $('#addStock').on('click', function () {
+                $('#stockForm')[0].reset();
+
+                $('#stockModalTitle').html('添加库存');
+                $('#id').val('');
+                document.getElementById('bookNo').readOnly = false;
+                document.getElementById('serialNo').readOnly = false;
+                $('#stockModal').modal('show');
+            });
+
+            $('#saveStock').on('click', function () {
+                var param = $('#stockForm').serialize();
+                $.ajax({
+                    type: $('#id').val() == '' ? 'post' : 'put',
+                    url: /*[[@{/grain/stock}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (result) {
+                        if (result == 1) {
+                            $('#stockModal').modal('hide');
+                            $('#stockTable').bootstrapTable('refresh');
+
+                            alertTip('success', '保存成功');
+                        } else {
+                            alertTip('error', '保存失败');
+                        }
+                    }
+                });
             });
         });
     </script>
