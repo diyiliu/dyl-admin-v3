@@ -25,11 +25,29 @@
             <div class="search-block" id="search-block">
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
-                        <div class="col-sm-6 col-md-4">
-                            <input type="text" class="form-control" placeholder="姓名/手机号" id="search"
+                        <div class="col-sm-3 col-md-4">
+                            <input type="text" class="form-control" placeholder="序列号/姓名" id="search"
                                    data-toggle="completer" data-suggest="true">
                         </div>
-                        <div class="col-sm-2 col-sm-offset-4 col-md-1 col-md-offset-7">
+                        <div class="col-sm-4 col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="createTime" placeholder="入库时间">
+                                <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="btnTime">
+                                             <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
+                                        </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 col-md-2">
+                            <select id="searchStatus" data-placeholder="付款状态 ..." name="status"
+                                    class="form-control chosen-select">
+                                <option value=""></option>
+                                <option value="0">未付款</option>
+                                <option value="1">已付款</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2 col-md-1 col-md-offset-2">
                             <button type="button" class="btn btn-primary btn-block" id="doSearch">查询</button>
                         </div>
                     </div>
@@ -139,6 +157,8 @@
                     var param = {
                         pageNo: params.pageNumber,
                         pageSize: params.pageSize,
+                        status: $('#searchStatus').val(),
+                        createTime: $('#createTime').val(),
                         search: $('#search').val()
                     };
                     return param;
@@ -231,10 +251,21 @@
                                 return '<span class="sf-sign-check" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
                             }
 
-                            return '<span class="sf-light-bulb" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
+                            return '<a href="javascript:void(0);" onclick="payMoney(this);" data-id="' + row.id + '" title="重置密码"><span class="sf-light-bulb" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
                         }
                     }
                 ]
+            });
+
+
+            $('#searchStatus').chosen({allow_single_deselect: true});
+
+            laydate.render({
+                elem: '#createTime'
+                ,type: 'datetime'
+                ,range: true
+                ,eventElem: '#btnTime'
+                ,trigger: 'click'
             });
 
             $('#doSearch').on('click', function () {
@@ -270,7 +301,107 @@
                     }
                 });
             });
+
+            $('#editStock').on('click', function () {
+                var stocks = $table.bootstrapTable('getSelections');
+                if (stocks.length != 1) {
+                    swal("请选择一条信息进行修改!");
+
+                    return;
+                }
+                $('#stockForm')[0].reset();
+                document.getElementById('bookNo').readOnly = true;
+                document.getElementById('serialNo').readOnly = true;
+
+                var stock = stocks[0];
+                $('#id').val(stock['id']);
+                $('#bookNo').val(stock['bookNo']);
+                $('#serialNo').val(stock['serialNo']);
+                if (stock['member']){
+                    $('#name').val(stock['member']['name']);
+                    $('#tel').val(stock['member']['tel']);
+                }
+
+                $('#tare').val(stock['tare']);
+                $('#gross').val(stock['gross']);
+                $('#price').val(stock['price']);
+
+                $('#stockModalTitle').html('修改库存');
+                $('#stockModal').modal('show');
+            });
+
+            $('#delStock').on('click', function () {
+                var stocks = $table.bootstrapTable('getSelections');
+                if (stocks.length < 1) {
+                    swal("请至少选择一条信息进行删除!");
+
+                    return;
+                }
+                // 提示
+                swal({
+                        title: "确定删除选中库存?",
+                        text: "删除后将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#e67e22",
+                        confirmButtonText: "删除",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        var idArr = [];
+                        for (var i = 0; i < stocks.length; i++) {
+                            idArr[i] = stocks[i]['id'];
+                        }
+                        $.ajax({
+                            type: 'delete',
+                            url: /*[[@{/grain/stock}]]*/,
+                            contentType: "application/json;charset=utf-8",
+                            data: JSON.stringify(idArr),
+                            dataType: "json",
+                            success: function (result) {
+                                if (result == 1) {
+                                    $('#stockModal').modal('hide');
+                                    $('#stockTable').bootstrapTable('refresh');
+
+                                    alertTip('success', '删除成功');
+                                } else {
+                                    alertTip('error', '删除失败');
+                                }
+                            }
+                        });
+                    });
+            });
         });
+
+        function payMoney(a) {
+            var id = $(a).data('id');
+            // 提示
+            swal({
+                    title: "确认付款状态?",
+                    text: "付款后将无法恢复",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#e67e22",
+                    confirmButtonText: "付款",
+                    closeOnConfirm: true
+                },
+                function () {
+                    var path = /*[[@{/grain/stockPay/}]]*/;
+                    $.ajax({
+                        type: 'put',
+                        url: path + id,
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 1) {
+                                $('#stockTable').bootstrapTable('refresh');
+                                alertTip('success', '付款成功');
+                            } else {
+                                alertTip('error', '付款失败');
+                            }
+                        }
+                    });
+                });
+        };
     </script>
 </div>
 </body>
