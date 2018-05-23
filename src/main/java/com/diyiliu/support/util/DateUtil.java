@@ -31,6 +31,22 @@ public class DateUtil {
         return date;
     }
 
+    public static Date strToDate(String datetime) {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date date = null;
+        if (StringUtils.isNotEmpty(datetime)) {
+            try {
+
+                date = format.parse(datetime);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return date;
+    }
+
     public static String dateToString(Date date) {
 
         if (date == null) {

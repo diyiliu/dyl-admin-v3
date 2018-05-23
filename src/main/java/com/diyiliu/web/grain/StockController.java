@@ -69,10 +69,15 @@ public class StockController {
                         }
 
                         if (StringUtils.isNotEmpty(createTime)){
-                            String starTime = createTime.substring(0, 19);
-                            String endTime = createTime.substring(22, 41);
-                            Date sTime = DateUtil.stringToDate(starTime);
-                            Date eTime = DateUtil.stringToDate(endTime);
+                            String starTime = createTime.substring(0, 10);
+                            String endTime = createTime.substring(13, 23);
+                            Date sTime = DateUtil.strToDate(starTime);
+                            Date eTime = DateUtil.strToDate(endTime);
+
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(eTime);
+                            calendar.add(Calendar.DAY_OF_MONTH, 1);
+                            eTime = calendar.getTime();
 
                             Predicate predicate = cb.between(createTimeExp, sTime, eTime);
                             list.add(predicate);
