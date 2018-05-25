@@ -2,8 +2,10 @@ package com.diyiliu.web.grain;
 
 import com.diyiliu.support.util.DateUtil;
 import com.diyiliu.web.grain.dto.Member;
+import com.diyiliu.web.grain.dto.Sold;
 import com.diyiliu.web.grain.dto.Stock;
 import com.diyiliu.web.grain.facade.MemberJpa;
+import com.diyiliu.web.grain.facade.SoldJpa;
 import com.diyiliu.web.grain.facade.StockJpa;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,15 +36,18 @@ public class StockController {
     @Resource
     private MemberJpa memberJpa;
 
+    @Resource
+    private SoldJpa soldJpa;
+
     @PostMapping("/stockList")
     public Map stockList(@RequestParam int pageNo, @RequestParam int pageSize, @RequestParam(required = false) Integer status,
-                        @RequestParam(required = false)String createTime, @RequestParam(required = false) String search) {
+                         @RequestParam(required = false) String createTime, @RequestParam(required = false) String search) {
 
         Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "createTime")});
         Pageable pageable = new PageRequest(pageNo - 1, pageSize, sort);
 
         Page<Stock> stockPage;
-        if (StringUtils.isEmpty(search) && status == null && StringUtils.isEmpty(createTime) && StringUtils.isEmpty(search)) {
+        if (StringUtils.isEmpty(search) && status == null && StringUtils.isEmpty(createTime)) {
             stockPage = stockJpa.findAll(pageable);
         } else {
             stockPage = stockJpa.findAll(
@@ -59,28 +64,17 @@ public class StockController {
 
                             Predicate predicate;
                             List<Member> members = memberJpa.findByNameLike("%" + search + "%");
-                            if (CollectionUtils.isNotEmpty(members)){
+                            if (CollectionUtils.isNotEmpty(members)) {
                                 predicate = cb.or(new Predicate[]{cb.like(serialNoExp, like), memberExp.in(members)});
-                            }else {
+                            } else {
                                 predicate = cb.like(serialNoExp, like);
                             }
 
                             list.add(predicate);
                         }
 
-                        if (StringUtils.isNotEmpty(createTime)){
-                            String starTime = createTime.substring(0, 10);
-                            String endTime = createTime.substring(13, 23);
-                            Date sTime = DateUtil.strToDate(starTime);
-                            Date eTime = DateUtil.strToDate(endTime);
-
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.setTime(eTime);
-                            calendar.add(Calendar.DAY_OF_MONTH, 1);
-                            eTime = calendar.getTime();
-
-                            Predicate predicate = cb.between(createTimeExp, sTime, eTime);
-                            list.add(predicate);
+                        if (StringUtils.isNotEmpty(createTime)) {
+                            list.add(betweenTime(createTime, createTimeExp, cb));
                         }
 
                         if (status != null) {
@@ -102,10 +96,10 @@ public class StockController {
     }
 
     @PostMapping("/stock")
-    public Integer saveStock(Stock stock){
+    public Integer saveStock(Stock stock) {
         Member member = stock.getMember();
         member = memberJpa.findByNameAndTel(member.getName(), member.getTel());
-        if (member == null){
+        if (member == null) {
             member = memberJpa.save(stock.getMember());
         }
         stock.setMember(member);
@@ -117,7 +111,7 @@ public class StockController {
         stock.setCreateTime(new Date());
         stock.setStatus(0);
         stock = stockJpa.save(stock);
-        if (stock == null){
+        if (stock == null) {
 
             return 0;
         }
@@ -126,10 +120,10 @@ public class StockController {
     }
 
     @PutMapping("/stock")
-    public Integer modifyStock(Stock stock){
+    public Integer modifyStock(Stock stock) {
         Member member = stock.getMember();
         member = memberJpa.findByNameAndTel(member.getName(), member.getTel());
-        if (member == null){
+        if (member == null) {
             member = memberJpa.save(stock.getMember());
         }
 
@@ -145,7 +139,7 @@ public class StockController {
         temp.setMoney(money);
 
         temp = stockJpa.save(temp);
-        if (temp == null){
+        if (temp == null) {
 
             return 0;
         }
@@ -162,16 +156,117 @@ public class StockController {
     }
 
     @PutMapping("/stockPay/{id}")
-    public Integer stockPay(@PathVariable Long id){
+    public Integer stockPay(@PathVariable Long id) {
         Stock stock = stockJpa.findById(id);
         stock.setStatus(1);
         stock.setPayTime(new Date());
         stock = stockJpa.save(stock);
-        if (stock == null){
+        if (stock == null) {
 
             return 0;
         }
 
         return 1;
+    }
+
+
+    @PostMapping("/soldList")
+    public Map soldList(@RequestParam int pageNo, @RequestParam int pageSize,
+                        @RequestParam(required = false) String createTime, @RequestParam(required = false) String search) {
+
+        Sort sort = new Sort(new Sort.Order[]{new Sort.Order(Sort.Direction.DESC, "createTime")});
+        Pageable pageable = new PageRequest(pageNo - 1, pageSize, sort);
+
+        Page<Sold> soldPage;
+        if (StringUtils.isEmpty(search) && StringUtils.isEmpty(createTime)) {
+            soldPage = soldJpa.findAll(pageable);
+        } else {
+            soldPage = soldJpa.findAll(
+                    (Root<Sold> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+                        Path<String> serialNoExp = root.get("serialNo");
+                        Path<Member> companyExp = root.get("company");
+                        Path<Date> createTimeExp = root.get("createTime");
+
+                        List<Predicate> list = new ArrayList();
+
+                        if (StringUtils.isNotEmpty(search)) {
+                            String like = "%" + search + "%";
+
+                            Predicate predicate = cb.or(new Predicate[]{cb.like(serialNoExp, like), companyExp.in(like)});
+                            list.add(predicate);
+                        }
+
+                        if (StringUtils.isNotEmpty(createTime)) {
+                            list.add(betweenTime(createTime, createTimeExp, cb));
+                        }
+
+                        Predicate[] predicates = list.toArray(new Predicate[]{});
+                        return cb.and(predicates);
+                    }, pageable);
+        }
+
+        Map respMap = new HashMap();
+        respMap.put("data", soldPage.getContent());
+        respMap.put("total", soldPage.getTotalElements());
+
+        return respMap;
+    }
+
+    @PostMapping("/sold")
+    public Integer saveSold(Sold sold) {
+        int suttle = sold.getGross() - sold.getTare();
+        double money = suttle * sold.getPrice();
+        sold.setSuttle(suttle);
+        sold.setMoney(money);
+        sold.setCreateTime(new Date());
+        sold = soldJpa.save(sold);
+        if (sold == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @PutMapping("/sold")
+    public Integer modifySold(Sold sold) {
+        int suttle = sold.getGross() - sold.getTare();
+        double money = suttle * sold.getPrice();
+        sold.setSuttle(suttle);
+        sold.setMoney(money);
+
+        // 填充创建时间
+        Sold temp = soldJpa.findById(sold.getId());
+        sold.setCreateTime(temp.getCreateTime());
+
+        temp = soldJpa.save(sold);
+        if (temp == null) {
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    @Transactional
+    @DeleteMapping("/sold")
+    public Integer deleteSold(@RequestBody List<Long> ids) {
+        soldJpa.deleteByIdIn(ids);
+
+        return 1;
+    }
+
+    private Predicate betweenTime(String dateTime, Path<Date> datePath, CriteriaBuilder cb) {
+        String starTime = dateTime.substring(0, 10);
+        String endTime = dateTime.substring(13, 23);
+        Date sTime = DateUtil.strToDate(starTime);
+        Date eTime = DateUtil.strToDate(endTime);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(eTime);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        eTime = calendar.getTime();
+
+        return cb.between(datePath, sTime, eTime);
     }
 }

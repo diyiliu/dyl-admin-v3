@@ -162,10 +162,34 @@ create table grain_stock
   tare                 int comment '皮重',
   suttle               int comment '净重',
   price                numeric(5,2) comment '单价',
-  money                numeric(8,1) comment '金额',
+  money                numeric(10,1) comment '金额',
   member_id            int comment '关系人',
   create_time          datetime comment '创建时间',
   pay_time             datetime comment '付款时间',
   status               int comment '状态',
+  primary key (id)
+);
+
+drop table if exists grain_sold;
+
+/*==============================================================*/
+/* Table: grain_sold                                            */
+/*==============================================================*/
+drop table if exists grain_sold;
+
+/*==============================================================*/
+/* Table: grain_sold                                            */
+/*==============================================================*/
+create table grain_sold
+(
+  id                   int not null auto_increment,
+  company              varchar(50) comment '收购单位',
+  serial_no            varchar(50) comment '出售单号',
+  gross                int comment '毛重',
+  tare                 int comment '去皮',
+  suttle               int comment '净重',
+  price                numeric(5,2) comment '单价',
+  money                numeric(10,1) comment '金额',
+  create_time          datetime comment '创建时间',
   primary key (id)
 );
