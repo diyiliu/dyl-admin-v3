@@ -184,15 +184,14 @@ public class StockController {
             soldPage = soldJpa.findAll(
                     (Root<Sold> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
                         Path<String> serialNoExp = root.get("serialNo");
-                        Path<Member> companyExp = root.get("company");
+                        Path<String> companyExp = root.get("company");
                         Path<Date> createTimeExp = root.get("createTime");
 
                         List<Predicate> list = new ArrayList();
 
                         if (StringUtils.isNotEmpty(search)) {
                             String like = "%" + search + "%";
-
-                            Predicate predicate = cb.or(new Predicate[]{cb.like(serialNoExp, like), companyExp.in(like)});
+                            Predicate predicate = cb.or(new Predicate[]{cb.like(serialNoExp, like), cb.like(companyExp, like)});
                             list.add(predicate);
                         }
 

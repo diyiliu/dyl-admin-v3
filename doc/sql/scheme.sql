@@ -161,7 +161,7 @@ create table grain_stock
   gross                int comment '毛重',
   tare                 int comment '皮重',
   suttle               int comment '净重',
-  price                numeric(5,2) comment '单价',
+  price                numeric(6,3) comment '单价',
   money                numeric(10,1) comment '金额',
   member_id            int comment '关系人',
   create_time          datetime comment '创建时间',
@@ -188,7 +188,7 @@ create table grain_sold
   gross                int comment '毛重',
   tare                 int comment '去皮',
   suttle               int comment '净重',
-  price                numeric(5,2) comment '单价',
+  price                numeric(6,3) comment '单价',
   money                numeric(10,1) comment '金额',
   create_time          datetime comment '创建时间',
   primary key (id)
