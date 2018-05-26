@@ -6,13 +6,14 @@
     <meta charset="UTF-8">
     <title>帝一流</title>
     <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/plugin/tagsinput/jquery.tagsinput.css}" type="text/css" rel="stylesheet">
 </head>
 <body>
 <div layout:fragment="cm-flex" class="cm-flex">
     <div class="cm-breadcrumb-container">
         <ol class="breadcrumb">
-            <li><a href="#">库存管理</a></li>
-            <li class="active">出库管理</li>
+            <li><a href="#">运维管理</a></li>
+            <li class="active">平台部署</li>
         </ol>
     </div>
     <form id="cm-search" action="index.html" method="get">
@@ -25,21 +26,11 @@
             <div class="search-block" id="search-block">
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
-                        <div class="col-sm-3 col-md-4">
-                            <input type="text" class="form-control" placeholder="序列号/公司名称" id="search"
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="地址/平台" id="search"
                                    data-toggle="completer" data-suggest="true">
                         </div>
-                        <div class="col-sm-4 col-md-3">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="createTime" placeholder="出库时间">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" id="btnTime">
-                                             <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
-                                        </button>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 col-sm-offset-3 col-md-1 col-md-offset-4">
+                        <div class="col-sm-2 col-sm-offset-6 col-md-1 col-md-offset-7">
                             <button type="button" class="btn btn-primary btn-block" id="doSearch">查询</button>
                         </div>
                     </div>
@@ -47,64 +38,83 @@
             </div>
             <div class="table-panel">
                 <div class="btn-group" role="group" id="toolbar">
-                    <button type="button" class="btn btn-default" id="addSold"><i class="fa fa-fw fa-plus"></i></button>
-                    <button type="button" class="btn btn-default" id="editSold"><i class="fa fa-fw fa-pencil"></i></button>
-                    <button type="button" class="btn btn-default" id="delSold"><i class="fa fa-fw fa-trash-o"></i></button>
+                    <button type="button" class="btn btn-default" id="addDeploy"><i class="fa fa-fw fa-plus"></i></button>
+                    <button type="button" class="btn btn-default" id="editDeploy"><i class="fa fa-fw fa-pencil"></i></button>
+                    <button type="button" class="btn btn-default" id="delDeploy"><i class="fa fa-fw fa-trash-o"></i></button>
                 </div>
-                <table id="soldTable"></table>
+                <table id="deployTable"></table>
             </div>
         </div>
     </div>
 </div>
 <div layout:fragment="myJs">
-    <div id="soldModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div id="deployModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">×</span></button>
-                    <h5 class="modal-title" id="soldModalTitle">
-                        添加出库
+                    <h5 class="modal-title" id="deployModalTitle">
+                        添加平台
                     </h5>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" id="soldForm">
+                    <form class="form-horizontal" id="deployForm">
                         <input type="hidden" id="id" name="id">
                         <div class="form-group">
-                            <label for="company" class="col-sm-2 control-label">公司名称</label>
+                            <label for="company" class="col-sm-2 control-label">系统</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="company" name="company" placeholder="单位">
+                                <select name="company" id="company" class="form-control">
+                                    <option value="Windows">Windows</option>
+                                    <option value="Linux">Linux</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="serialNo" class="col-sm-2 control-label">序列号</label>
+                            <label for="address" class="col-sm-2 control-label">地址</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="serialNo" name="serialNo" placeholder="序列号">
+                                <input type="text" class="form-control" id="address" name="address" placeholder="地址">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="gross" class="col-sm-2 control-label">毛重</label>
+                            <label for="platform" class="col-sm-2 control-label">平台</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="gross" name="gross" placeholder="毛重">
+                                <div class="modal-tag">
+                                    <input type="text" class="tags" id="platform" name="platform">
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="tare" class="col-sm-2 control-label">去皮</label>
+                            <label for="tag" class="col-sm-2 control-label">标签</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="tare" name="tare" placeholder="去皮">
+                                <div class="modal-tag">
+                                    <input type="text" class="tags" id="tag" name="tag">
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="price" class="col-sm-2 control-label">单价</label>
+                            <label for="username" class="col-sm-2 control-label">用户名</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="price" name="price" placeholder="单价">
+                                <input type="text" class="form-control" id="username" name="username" placeholder="用户名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="col-sm-2 control-label">密码</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="password" name="password" placeholder="密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment" class="col-sm-2 control-label">描述</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="comment" id="comment" rows="3"></textarea>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="saveSold">保存</button>
+                    <button type="button" class="btn btn-primary" id="saveDeploy">保存</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -112,13 +122,14 @@
         <!-- /.modal-dialog -->
     </div>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
+    <script th:src="@{/static/plugin/tagsinput/jquery.tagsinput.js}"></script>
     <script th:inline="javascript">
         $(function () {
             var autoHeight = $("div.auto-height").height();
             var rowHeight = $('#search-block').height();
             var tableHeight = autoHeight - rowHeight;
 
-            var $table = $('#soldTable');
+            var $table = $('#deployTable');
             $table.bootstrapTable({
                 // 条纹
                 striped: true,
@@ -127,7 +138,7 @@
                 pagination: true,
                 paginationLoop: false,
                 sidePagination: 'server',
-                url: /*[[@{/grain/soldList}]]*/,
+                url: /*[[@{/opt/deployList}]]*/,
                 method: 'post',
                 contentType: "application/x-www-form-urlencoded",
                 dataField: "data",
@@ -136,7 +147,6 @@
                     var param = {
                         pageNo: params.pageNumber,
                         pageSize: params.pageSize,
-                        createTime: $('#createTime').val(),
                         search: $('#search').val()
                     };
                     return param;
@@ -156,83 +166,56 @@
                         checkbox: true
                     },
                     {
-                        field: 'company',
-                        title: '公司名称'
+                        field: 'os',
+                        title: '系统'
                     },
                     {
-                        field: 'serialNo',
-                        title: '序列号'
-                    },
-                    {
-                        field: 'gross',
-                        title: '毛重',
-                        align: 'right'
-                    },
-                    {
-                        field: 'tare',
-                        title: '去皮',
-                        align: 'right'
-                    },
-                    {
-                        field: 'suttle',
-                        title: '净重 (kg)',
+                        field: 'address',
+                        title: '地址',
                         align: 'center'
                     },
                     {
-                        field: 'price',
-                        title: '单价 (元/kg)',
-                        align: 'center'
+                        field: 'platform',
+                        title: '平台'
                     },
                     {
-                        field: 'money',
-                        title: '金额 (元)',
-                        align: 'right',
+                        field: 'tag',
+                        title: '标签'
+                    },
+                    {
+                        field: 'username',
+                        title: '用户名'
+                    },
+                    {
+                        field: 'password',
+                        title: '密码'
+                    },
+                    {
+                        field: 'comment',
+                        title: '备注',
                         formatter: function (value, row, index) {
-                            value = value + '';
-                            if (value.indexOf('.') > 0){
-                                return value.split('.')[0];
-                            }
 
                             return value;
                         }
-                    },
-                    {
-                        field: 'createTime',
-                        title: '创建时间',
-                        align: 'center',
-                        formatter: function (value, row, index) {
-                            var str = '';
-                            if (value) {
-                                str = value.substr(0, 10);
-                            }
-
-                            return '<span style="cursor: default" title="' + value + '">' + str + '</span>';
-                        }
                     }
                 ]
-            });
-
-            laydate.render({
-                elem: '#createTime'
-                ,type: 'date'
-                ,range: true
-                ,eventElem: '#btnTime'
-                ,trigger: 'click'
             });
 
             $('#doSearch').on('click', function () {
                 $table.bootstrapTable("refresh");
             });
 
-            $('#addSold').on('click', function () {
-                $('#soldForm')[0].reset();
+            $('#addDeploy').on('click', function () {
+                $('#deployForm')[0].reset();
+                $('#platform').tagsInput({defaultText: '编辑', width: 'auto', height: 60});
+                $('#tag').tagsInput({defaultText: '编辑', width: 'auto', height: 90});
 
-                $('#soldModalTitle').html('添加出库');
+                $('#deployModalTitle').html('添加平台');
                 $('#id').val('');
-                $('#soldModal').modal('show');
+                $('#deployModal').modal('show');
             });
 
-            $('#saveSold').on('click', function () {
+            $('#saveDeploy').on('click', function () {
                 var param = $('#soldForm').serialize();
                 $.ajax({
                     type: $('#id').val() == '' ? 'post' : 'put',
@@ -252,7 +235,7 @@
                 });
             });
 
-            $('#editSold').on('click', function () {
+            $('#editDeploy').on('click', function () {
                 var solds = $table.bootstrapTable('getSelections');
                 if (solds.length != 1) {
                     swal("请选择一条信息进行修改!");
@@ -274,7 +257,7 @@
                 $('#soldModal').modal('show');
             });
 
-            $('#delSold').on('click', function () {
+            $('#delDeploy').on('click', function () {
                 var solds = $table.bootstrapTable('getSelections');
                 if (solds.length < 1) {
                     swal("请至少选择一条信息进行删除!");
