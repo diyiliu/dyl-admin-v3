@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * Description: Deploy
@@ -38,5 +39,5 @@ public class Deploy {
 
     private String createUser;
 
-    private String createTime;
+    private Date createTime;
 }

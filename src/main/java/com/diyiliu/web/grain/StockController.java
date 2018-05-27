@@ -169,7 +169,6 @@ public class StockController {
         return 1;
     }
 
-
     @PostMapping("/soldList")
     public Map soldList(@RequestParam int pageNo, @RequestParam int pageSize,
                         @RequestParam(required = false) String createTime, @RequestParam(required = false) String search) {

@@ -62,9 +62,9 @@
                     <form class="form-horizontal" id="deployForm">
                         <input type="hidden" id="id" name="id">
                         <div class="form-group">
-                            <label for="company" class="col-sm-2 control-label">系统</label>
+                            <label for="os" class="col-sm-2 control-label">系统</label>
                             <div class="col-sm-10">
-                                <select name="company" id="company" class="form-control">
+                                <select name="os" id="os" class="form-control">
                                     <option value="Windows">Windows</option>
                                     <option value="Linux">Linux</option>
                                 </select>
@@ -80,7 +80,7 @@
                             <label for="platform" class="col-sm-2 control-label">平台</label>
                             <div class="col-sm-10">
                                 <div class="modal-tag">
-                                    <input type="text" class="tags" id="platform" name="platform">
+                                    <input type="text" class="tags" id="platform" name="platform" placeholder="编辑">
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                             <label for="tag" class="col-sm-2 control-label">标签</label>
                             <div class="col-sm-10">
                                 <div class="modal-tag">
-                                    <input type="text" class="tags" id="tag" name="tag">
+                                    <input type="text" class="tags" id="tag" name="tag" placeholder="编辑">
                                 </div>
                             </div>
                         </div>
@@ -160,6 +160,9 @@
                 formatRecordsPerPage: function (a) {
                     return "每页 " + a;
                 },
+                formatNoMatches: function () {
+                    return '没有找到匹配的数据';
+                },
                 columns: [
                     {
                         field: '',
@@ -205,10 +208,13 @@
                 $table.bootstrapTable("refresh");
             });
 
+            $('#platform').tagsInput({defaultText: '编辑', width: 'auto', height: 60});
+            $('#tag').tagsInput({defaultText: '编辑', width: 'auto', height: 90});
+
             $('#addDeploy').on('click', function () {
                 $('#deployForm')[0].reset();
-                $('#platform').tagsInput({defaultText: '编辑', width: 'auto', height: 60});
-                $('#tag').tagsInput({defaultText: '编辑', width: 'auto', height: 90});
+                $('#platform').importTags('');
+                $('#tag').importTags('');
 
                 $('#deployModalTitle').html('添加平台');
                 $('#id').val('');
@@ -216,16 +222,16 @@
             });
 
             $('#saveDeploy').on('click', function () {
-                var param = $('#soldForm').serialize();
+                var param = $('#deployForm').serialize();
                 $.ajax({
                     type: $('#id').val() == '' ? 'post' : 'put',
-                    url: /*[[@{/grain/sold}]]*/,
+                    url: /*[[@{/opt/deploy}]]*/,
                     data: param,
                     dataType: "json",
                     success: function (result) {
                         if (result == 1) {
-                            $('#soldModal').modal('hide');
-                            $('#soldTable').bootstrapTable('refresh');
+                            $('#deployModal').modal('hide');
+                            $('#deployTable').bootstrapTable('refresh');
 
                             alertTip('success', '保存成功');
                         } else {
@@ -236,37 +242,47 @@
             });
 
             $('#editDeploy').on('click', function () {
-                var solds = $table.bootstrapTable('getSelections');
-                if (solds.length != 1) {
+                var deploys = $table.bootstrapTable('getSelections');
+                if (deploys.length != 1) {
                     swal("请选择一条信息进行修改!");
 
                     return;
                 }
-                $('#soldForm')[0].reset();
+                $('#deployForm')[0].reset();
 
-                var sold = solds[0];
-                $('#id').val(sold['id']);
-                $('#company').val(sold['company']);
-                $('#serialNo').val(sold['serialNo']);
+                var deploy = deploys[0];
+                $('#id').val(deploy['id']);
+                $('#address').val(deploy['address']);
+                $('#username').val(deploy['username']);
+                $('#password').val(deploy['password']);
+                $('#comment').val(deploy['comment']);
 
-                $('#tare').val(sold['tare']);
-                $('#gross').val(sold['gross']);
-                $('#price').val(sold['price']);
+                $('#platform').importTags(deploy['platform']);
+                $('#tag').importTags(deploy['tag']);
 
-                $('#soldModalTitle').html('修改出库');
-                $('#soldModal').modal('show');
+                // 下拉选中
+                var options = document.getElementById('os').options;
+                for (var i = 0; i < options.length; i++) {
+                    var o = options[i];
+                    if (o.value == deploy['os']) {
+                        o.selected = true;
+                    }
+                }
+
+                $('#deployModalTitle').html('修改平台');
+                $('#deployModal').modal('show');
             });
 
             $('#delDeploy').on('click', function () {
-                var solds = $table.bootstrapTable('getSelections');
-                if (solds.length < 1) {
+                var deploys = $table.bootstrapTable('getSelections');
+                if (deploys.length < 1) {
                     swal("请至少选择一条信息进行删除!");
 
                     return;
                 }
                 // 提示
                 swal({
-                        title: "确定删除选中出库?",
+                        title: "确定删除选中平台?",
                         text: "删除后将无法恢复",
                         type: "warning",
                         showCancelButton: true,
@@ -276,19 +292,19 @@
                     },
                     function () {
                         var idArr = [];
-                        for (var i = 0; i < solds.length; i++) {
-                            idArr[i] = solds[i]['id'];
+                        for (var i = 0; i < deploys.length; i++) {
+                            idArr[i] = deploys[i]['id'];
                         }
                         $.ajax({
                             type: 'delete',
-                            url: /*[[@{/grain/sold}]]*/,
+                            url: /*[[@{/opt/deploy}]]*/,
                             contentType: "application/json;charset=utf-8",
                             data: JSON.stringify(idArr),
                             dataType: "json",
                             success: function (result) {
                                 if (result == 1) {
-                                    $('#soldModal').modal('hide');
-                                    $('#soldTable').bootstrapTable('refresh');
+                                    $('#deployModal').modal('hide');
+                                    $('#deployTable').bootstrapTable('refresh');
 
                                     alertTip('success', '删除成功');
                                 } else {
