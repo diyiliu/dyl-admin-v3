@@ -140,3 +140,30 @@
     line-height: 210px;
     color: #444c67;
 }
+
+
+.table-panel{
+    position: relative;
+}
+.table-panel .sum{
+    position: absolute;
+    width: 260px;
+    padding: 6px 0px;
+    text-align: right;
+    top: 10px;
+    right: 0px;
+}
+
+.sum span{
+    margin-left: 10px;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-size: 18px 18px;
+}
+.sum b{
+    margin-left: 5px;
+    display: inline-block;
+    height: 18px;
+    line-height: 18px;
+}

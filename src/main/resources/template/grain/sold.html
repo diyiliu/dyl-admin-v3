@@ -46,6 +46,10 @@
                 </form>
             </div>
             <div class="table-panel">
+                <div class="sum">
+                    <span class="sf-dashboard">&nbsp;</span><b id="sumWeight">: 0 kg</b>
+                    <span class="sf-bitcoin">&nbsp;</span><b id="sumMoney">: 0 元</b>
+                </div>
                 <div class="btn-group" role="group" id="toolbar">
                     <button type="button" class="btn btn-default" id="addSold"><i class="fa fa-fw fa-plus"></i></button>
                     <button type="button" class="btn btn-default" id="editSold"><i class="fa fa-fw fa-pencil"></i></button>
@@ -149,6 +153,14 @@
                 },
                 formatRecordsPerPage: function (a) {
                     return "每页 " + a;
+                },
+                formatNoMatches: function () {
+                    return '没有找到匹配的数据';
+                },
+                onLoadSuccess:function(data){
+
+                    $('#sumWeight').html(': ' + data['sumWeight'] + ' kg');
+                    $('#sumMoney').html(': ' + data['sumMoney'] + ' 元');
                 },
                 columns: [
                     {

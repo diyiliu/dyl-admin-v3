@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -88,9 +89,24 @@ public class StockController {
                     }, pageable);
         }
 
+        int sumWeight = 0;
+        int sumMoney = 0;
+        List sumList = stockJpa.selectSum();
+        if (CollectionUtils.isNotEmpty(sumList)) {
+            Object[] objects = (Object[]) sumList.get(0);
+            if (objects[0] != null) {
+                sumWeight = ((BigDecimal) objects[0]).intValue();
+            }
+            if (objects[1] != null) {
+                sumMoney = ((BigDecimal) objects[1]).intValue();
+            }
+        }
+
         Map respMap = new HashMap();
         respMap.put("data", stockPage.getContent());
         respMap.put("total", stockPage.getTotalElements());
+        respMap.put("sumWeight", sumWeight);
+        respMap.put("sumMoney", sumMoney);
 
         return respMap;
     }
@@ -203,9 +219,24 @@ public class StockController {
                     }, pageable);
         }
 
+        int sumWeight = 0;
+        int sumMoney = 0;
+        List sumList = soldJpa.selectSum();
+        if (CollectionUtils.isNotEmpty(sumList)) {
+            Object[] objects = (Object[]) sumList.get(0);
+            if (objects[0] != null) {
+                sumWeight = ((BigDecimal) objects[0]).intValue();
+            }
+            if (objects[1] != null) {
+                sumMoney = ((BigDecimal) objects[1]).intValue();
+            }
+        }
+
         Map respMap = new HashMap();
         respMap.put("data", soldPage.getContent());
         respMap.put("total", soldPage.getTotalElements());
+        respMap.put("sumWeight", sumWeight);
+        respMap.put("sumMoney", sumMoney);
 
         return respMap;
     }
@@ -253,6 +284,7 @@ public class StockController {
 
         return 1;
     }
+
 
     private Predicate betweenTime(String dateTime, Path<Date> datePath, CriteriaBuilder cb) {
         String starTime = dateTime.substring(0, 10);
