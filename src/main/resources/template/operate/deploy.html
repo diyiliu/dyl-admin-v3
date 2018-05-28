@@ -179,11 +179,33 @@
                     },
                     {
                         field: 'platform',
-                        title: '平台'
+                        title: '平台',
+                        formatter: function (value, row, index) {
+                            var str = '';
+                            if (value){
+                                var array = value.split(',');
+                                for (var i = 0; i < array.length; i++){
+                                    str += '<span class="btn-info" style="display: inline-block">' + array[i] +' </span>&nbsp;&nbsp;';
+                                }
+                            }
+
+                            return str;
+                        }
                     },
                     {
                         field: 'tag',
-                        title: '标签'
+                        title: '标签',
+                        formatter: function (value, row, index) {
+                            var str = '';
+                            if (value){
+                                var array = value.split(',');
+                                for (var i = 0; i < array.length; i++){
+                                    str += '<span class="btn-turquoise" style="display: inline-block">' + array[i] +' </span>&nbsp;&nbsp;';
+                                }
+                            }
+
+                            return str;
+                        }
                     },
                     {
                         field: 'username',
@@ -195,11 +217,7 @@
                     },
                     {
                         field: 'comment',
-                        title: '备注',
-                        formatter: function (value, row, index) {
-
-                            return value;
-                        }
+                        title: '备注'
                     }
                 ]
             });
