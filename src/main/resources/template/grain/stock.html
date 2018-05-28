@@ -55,8 +55,9 @@
             </div>
             <div class="table-panel">
                 <div class="sum">
-                    <span class="sf-dashboard">&nbsp;</span><b id="sumWeight">: 0 kg</b>
-                    <span class="sf-bitcoin">&nbsp;</span><b id="sumMoney">: 0 元</b>
+                    <span class="sf-user-male-alt">&nbsp;</span><b id="debt" title="欠款">: -0 元</b>
+                    <span class="sf-dashboard">&nbsp;</span><b id="sumWeight" title="总重量">: 0 kg</b>
+                    <span class="sf-bitcoin">&nbsp;</span><b id="sumMoney" title="总金额">: 0 元</b>
                 </div>
                 <div class="btn-group" role="group" id="toolbar">
                     <button type="button" class="btn btn-default" id="addStock"><i class="fa fa-fw fa-plus"></i></button>
@@ -182,6 +183,7 @@
 
                     $('#sumWeight').html(': ' + data['sumWeight'] + ' kg');
                     $('#sumMoney').html(': ' + data['sumMoney'] + ' 元');
+                    $('#debt').html(': -' + data['debt'] + ' 元');
                 },
                 columns: [
                     {
@@ -262,7 +264,7 @@
                                 return '<span class="sf-sign-check" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span>';
                             }
 
-                            return '<a href="javascript:void(0);" onclick="payMoney(this);" data-id="' + row.id + '" title="重置密码"><span class="sf-light-bulb" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
+                            return '<a href="javascript:void(0);" onclick="payMoney(this);" data-id="' + row.id + '" title="付款"><span class="sf-light-bulb" style="display: inline-block;width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
                         }
                     }
                 ]

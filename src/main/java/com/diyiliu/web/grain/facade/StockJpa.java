@@ -20,4 +20,7 @@ public interface StockJpa extends JpaRepository<Stock, Long>, JpaSpecificationEx
 
     @Query(value = "select sum(suttle), sum(money) from grain_stock", nativeQuery = true)
     List selectSum();
+
+    @Query(value = "select sum(money) from grain_stock where status=0", nativeQuery = true)
+    Double selectDebt();
 }

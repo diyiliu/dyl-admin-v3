@@ -102,11 +102,15 @@ public class StockController {
             }
         }
 
+        // 未支付金额
+        Double debt = stockJpa.selectDebt();
+
         Map respMap = new HashMap();
         respMap.put("data", stockPage.getContent());
         respMap.put("total", stockPage.getTotalElements());
         respMap.put("sumWeight", sumWeight);
         respMap.put("sumMoney", sumMoney);
+        respMap.put("debt", debt == null ? 0 : debt.intValue());
 
         return respMap;
     }
