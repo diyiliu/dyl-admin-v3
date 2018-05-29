@@ -38,6 +38,7 @@ dependencies {
     compile group: 'org.thymeleaf', name: 'thymeleaf', version: "$thymeleafVersion"
     compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version: "$thymeleafVersion"
     compile group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '2.3.0'
+    compile group: 'com.github.theborakompanioni', name: 'thymeleaf-extras-shiro', version: '2.0.0'
 
     // 注意jquery版本(必要时需要排除版本冲突)
     compile group: 'org.webjars.npm', name: 'jquery', version: '2.1.4'

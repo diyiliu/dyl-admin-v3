@@ -1,5 +1,6 @@
 package com.diyiliu.support.config;
 
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,6 +60,11 @@ public class WebConfig {
         });
 
         return objectMapper;
+    }
+
+    @Bean
+    public ShiroDialect shiroDialect() {
+        return new ShiroDialect();
     }
 
     /**

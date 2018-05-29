@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
       layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
@@ -38,9 +39,9 @@
             </div>
             <div class="table-panel">
                 <div class="btn-group" role="group" id="toolbar">
-                    <button type="button" class="btn btn-default" id="addDeploy"><i class="fa fa-fw fa-plus"></i></button>
-                    <button type="button" class="btn btn-default" id="editDeploy"><i class="fa fa-fw fa-pencil"></i></button>
-                    <button type="button" class="btn btn-default" id="delDeploy"><i class="fa fa-fw fa-trash-o"></i></button>
+                    <button shiro:hasPermission="deploy:add" type="button" class="btn btn-default" id="addDeploy"><i class="fa fa-fw fa-plus"></i></button>
+                    <button shiro:hasPermission="deploy:edit"  type="button" class="btn btn-default" id="editDeploy"><i class="fa fa-fw fa-pencil"></i></button>
+                    <button shiro:hasPermission="deploy:delete"  type="button" class="btn btn-default" id="delDeploy"><i class="fa fa-fw fa-trash-o"></i></button>
                 </div>
                 <table id="deployTable"></table>
             </div>
