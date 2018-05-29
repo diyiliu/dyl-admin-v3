@@ -125,6 +125,17 @@
                                 <input type="text" class="form-control" id="price" name="price" placeholder="单价">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="status" class="col-sm-2 control-label">付款</label>
+                            <div class="col-sm-10">
+                                <input type="hidden" id="status" name="status" value="0">
+                                <div class="form-control" style="border: 0px;box-shadow: none">
+                                    <a href="javascript:void(0);" id="isPay">
+                                        <img th:src="@{/static/img/sf/switch-off.svg}" height="24" width="24">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -136,6 +147,7 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
+    <script th:src="@{/static/js/jquery-migrate-1.2.1.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
     <script th:inline="javascript">
         $(function () {
@@ -292,7 +304,18 @@
                 $('#id').val('');
                 document.getElementById('bookNo').readOnly = false;
                 document.getElementById('serialNo').readOnly = false;
+                $('#status').val(0);
+                $('#isPay').find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
                 $('#stockModal').modal('show');
+            });
+
+            var i = 1;
+            $('#isPay').toggle(function () {
+                $(this).find('img').attr('src', /*[[@{/static/img/sf/switch-on.svg}]]*/);
+                $('#status').val(i++ % 2);
+            }, function () {
+                $(this).find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
+                $('#status').val(i++ % 2);
             });
 
             $('#saveStock').on('click', function () {
@@ -338,6 +361,15 @@
                 $('#tare').val(stock['tare']);
                 $('#gross').val(stock['gross']);
                 $('#price').val(stock['price']);
+
+                // 是否付款
+                if (stock['status'] == 1) {
+                    $('#status').val(1);
+                    $('#isPay').find('img').attr('src', /*[[@{/static/img/sf/switch-on.svg}]]*/);
+                }else {
+                    $('#status').val(0);
+                    $('#isPay').find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
+                }
 
                 $('#stockModalTitle').html('修改库存');
                 $('#stockModal').modal('show');

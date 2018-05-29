@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -89,18 +90,6 @@ public class StockController {
                     }, pageable);
         }
 
-        int sumWeight = 0;
-        int sumMoney = 0;
-        List sumList = stockJpa.selectSum();
-        if (CollectionUtils.isNotEmpty(sumList)) {
-            Object[] objects = (Object[]) sumList.get(0);
-            if (objects[0] != null) {
-                sumWeight = ((BigDecimal) objects[0]).intValue();
-            }
-            if (objects[1] != null) {
-                sumMoney = ((BigDecimal) objects[1]).intValue();
-            }
-        }
 
         // 未支付金额
         Double debt = stockJpa.selectDebt();
@@ -108,9 +97,10 @@ public class StockController {
         Map respMap = new HashMap();
         respMap.put("data", stockPage.getContent());
         respMap.put("total", stockPage.getTotalElements());
-        respMap.put("sumWeight", sumWeight);
-        respMap.put("sumMoney", sumMoney);
-        respMap.put("debt", debt == null ? 0 : debt.intValue());
+        respMap.put("debt", debt == null ? 0 : formatStr(debt));
+
+        List sumList = stockJpa.selectSum();
+        loadSum(sumList, respMap);
 
         return respMap;
     }
@@ -129,7 +119,6 @@ public class StockController {
         stock.setSuttle(suttle);
         stock.setMoney(money);
         stock.setCreateTime(new Date());
-        stock.setStatus(0);
         stock = stockJpa.save(stock);
         if (stock == null) {
 
@@ -157,6 +146,7 @@ public class StockController {
         temp.setPrice(stock.getPrice());
         temp.setSuttle(suttle);
         temp.setMoney(money);
+        temp.setStatus(stock.getStatus());
 
         temp = stockJpa.save(temp);
         if (temp == null) {
@@ -223,24 +213,13 @@ public class StockController {
                     }, pageable);
         }
 
-        int sumWeight = 0;
-        int sumMoney = 0;
-        List sumList = soldJpa.selectSum();
-        if (CollectionUtils.isNotEmpty(sumList)) {
-            Object[] objects = (Object[]) sumList.get(0);
-            if (objects[0] != null) {
-                sumWeight = ((BigDecimal) objects[0]).intValue();
-            }
-            if (objects[1] != null) {
-                sumMoney = ((BigDecimal) objects[1]).intValue();
-            }
-        }
 
         Map respMap = new HashMap();
         respMap.put("data", soldPage.getContent());
         respMap.put("total", soldPage.getTotalElements());
-        respMap.put("sumWeight", sumWeight);
-        respMap.put("sumMoney", sumMoney);
+
+        List sumList = soldJpa.selectSum();
+        loadSum(sumList, respMap);
 
         return respMap;
     }
@@ -287,6 +266,29 @@ public class StockController {
         soldJpa.deleteByIdIn(ids);
 
         return 1;
+    }
+
+
+    private void loadSum(List sumList, Map map){
+        int sumWeight = 0;
+        int sumMoney = 0;
+        if (CollectionUtils.isNotEmpty(sumList)) {
+            Object[] objects = (Object[]) sumList.get(0);
+            if (objects[0] != null) {
+                sumWeight = ((BigDecimal) objects[0]).intValue();
+            }
+            if (objects[1] != null) {
+                sumMoney = ((BigDecimal) objects[1]).intValue();
+            }
+        }
+
+        map.put("sumWeight", formatStr(sumWeight));
+        map.put("sumMoney", formatStr(sumMoney));
+    }
+
+    private String formatStr(double data) {
+        DecimalFormat df = new DecimalFormat("#,###");
+        return df.format(data);
     }
 
 

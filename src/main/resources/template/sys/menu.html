@@ -116,8 +116,9 @@
                             <div class="col-sm-10">
                                 <input type="hidden" id="isMenu" value="0" name="isMenu">
                                 <div class="form-control" style="border: 0px;box-shadow: none">
-                                    <a href="#" id="isNav"><img th:src="@{/static/img/sf/switch-off.svg}" height="24"
-                                                                width="24"></a>
+                                    <a href="javascript:void(0);" id="isNav">
+                                        <img th:src="@{/static/img/sf/switch-off.svg}" height="24" width="24">
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -134,7 +135,6 @@
     </div>
     <script th:src="@{/static/js/jquery-migrate-1.2.1.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
-    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table-locale-all.js}"></script>
     <script th:src="@{/static/plugin/treegrid/js/bootstrap-table-treegrid.js}"></script>
     <script th:src="@{/static/plugin/treegrid/js/jquery.treegrid.js}"></script>
     <script th:src="@{/static/plugin/treeview/dhtmlxtreeview.min.js}"></script>
