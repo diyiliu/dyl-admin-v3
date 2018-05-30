@@ -71,7 +71,7 @@ public class HomeController {
         return "index";
     }
 
-    @GetMapping("/console")
+    @GetMapping("/home")
     public String index(HttpSession session) {
         SysAsset asset = sysAssetJpa.findByCode("index");
         session.setAttribute("active", asset);

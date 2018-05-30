@@ -42,7 +42,7 @@ logging:
 # shiro
 shiro:
   login-url: '/login'
-  success-url: '/console'
+  success-url: '/home'
   hash-algorithm: MD5
   hash-iterations: 2
   username-param: username
