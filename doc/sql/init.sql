@@ -1,7 +1,7 @@
 /*==============================================================*/
 /* sys_asset 系统资源                                           */
 /*==============================================================*/
-INSERT INTO `admin3`.`sys_asset` (`id`, `name`, `code`, `pid`, `pids`, `type`, `controller`, `view`, `icon_css`, `is_menu`, `sort`) VALUES ('1', '首页', 'index', '0', '0', 'menu', 'console', 'index', 'sf-house', '1', '1');
+INSERT INTO `admin3`.`sys_asset` (`id`, `name`, `code`, `pid`, `pids`, `type`, `controller`, `view`, `icon_css`, `is_menu`, `sort`) VALUES ('1', '首页', 'index', '0', '0', 'menu', 'home', 'index', 'sf-house', '1', '1');
 INSERT INTO `admin3`.`sys_asset` (`id`, `name`, `code`, `pid`, `pids`, `type`, `controller`, `view`, `icon_css`, `is_menu`, `sort`) VALUES ('2', '海洋浮球', 'buoy', '0', '0', 'node', '', '', 'sf-compass', '1', '20');
 INSERT INTO `admin3`.`sys_asset` (`id`, `name`, `code`, `pid`, `pids`, `type`, `controller`, `view`, `icon_css`, `is_menu`, `sort`) VALUES ('3', '浮球列表', 'list', '2', '0/2', 'menu', 'home/buoy1', 'buoy/list', '', '1', '5');
 INSERT INTO `admin3`.`sys_asset` (`id`, `name`, `code`, `pid`, `pids`, `type`, `controller`, `view`, `icon_css`, `is_menu`, `sort`) VALUES ('4', '历史回放', 'history', '2', '0/2', 'menu', 'home/buoy2', 'buoy/historyData', NULL, '1', '10');
