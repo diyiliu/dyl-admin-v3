@@ -65,11 +65,16 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        SysAsset asset = sysAssetJpa.findByCode("index");
+        request.getSession().setAttribute("active", asset);
+
         return "index";
     }
 
     @GetMapping("/console")
-    public String index() {
+    public String index(HttpSession session) {
+        SysAsset asset = sysAssetJpa.findByCode("index");
+        session.setAttribute("active", asset);
 
         return "index";
     }
