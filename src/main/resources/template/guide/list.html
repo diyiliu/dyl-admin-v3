@@ -7,6 +7,7 @@
     <title>帝一流</title>
     <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.css}" type="text/css" rel="stylesheet">
     <link th:href="@{/static/plugin/tagsinput/jquery.tagsinput.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/static/plugin/fakeLoader/fakeLoader.css}" type="text/css" rel="stylesheet">
 </head>
 <body class="cm-no-transition cm-2-navbar">
 <div layout:fragment="cm-flex" class="cm-flex">
@@ -64,6 +65,11 @@
     <div id="siteModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+                <!-- 提交表单等待 -->
+                <div class="loading">
+                    <div class="fl spinner3"><div class="dot1"></div><div class="dot2"></div></div>
+                </div>
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">×</span></button>
@@ -247,6 +253,22 @@
                 $('#selType').chosen();
             });
 
+
+            $('#siteModal').on('show.bs.modal', function () {
+                var h = $(this).find('.modal-dialog').height();
+                var w = $(this).find('.modal-dialog').width();
+                $(this).find('.loading').height(h);
+                $(this).find('.loading').width(w);
+
+                var flH =  $(this).find('.loading .fl').height();
+                var flW =  $(this).find('.loading .fl').width();
+                $(this).find('.loading .fl').css({
+                    'position':'absolute',
+                    'left':(w/2)-(flW/2),
+                    'top':(h/2)-(flH/2)
+                });
+            });
+
             $('#saveSite').on('click', function () {
                 var param = $('#siteForm').serialize();
                 $.ajax({
@@ -254,6 +276,12 @@
                     url: /*[[@{/guide/site}]]*/,
                     data: param,
                     dataType: "json",
+                    beforeSend: function(){
+                        $('#siteModal .loading').fadeIn();
+                    },
+                    complete: function(){
+                        $('#siteModal .loading').fadeOut();
+                    },
                     success: function (result) {
                         if (result == 1) {
                             $('#siteModal').modal('hide');
@@ -263,6 +291,9 @@
                         } else {
                             alertTip('error', '保存失败');
                         }
+                    },
+                    error: function () {
+                        alertTip('error', '保存失败');
                     }
                 });
             });

@@ -141,7 +141,7 @@
     color: #444c67;
 }
 
-
+/* table 统计数据 */
 .table-panel{
     position: relative;
 }
@@ -166,4 +166,26 @@
     display: inline-block;
     height: 18px;
     line-height: 18px;
+}
+
+/* 模态框 提交等待 */
+.modal .loading{
+    display: none;
+    z-index: 2000;
+    position: absolute;
+    background-color: #000000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+.modal .loading .fl{
+    position: absolute;
+}
+
+.loading .fl .dot1{
+    background-color: #17a689 ;
+}
+
+.loading .fl  .dot2{
+    background-color: #9b59b6;
 }

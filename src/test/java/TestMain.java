@@ -1,7 +1,9 @@
+import com.diyiliu.support.util.DateUtil;
 import com.diyiliu.support.util.JacksonUtil;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,5 +47,14 @@ public class TestMain {
         List list = JacksonUtil.toList(str, Map.class);
 
         System.out.println(list.size());
+    }
+
+
+    @Test
+    public void test4(){
+        System.out.println(DateUtil.dateToString(new Date(1527747329109l)));
+
+        long l = System.currentTimeMillis();
+        System.out.println(l - 1527747329109l < (2147483647l * 1000));
     }
 }
