@@ -128,10 +128,10 @@
                         <div class="form-group">
                             <label for="status" class="col-sm-2 control-label">付款</label>
                             <div class="col-sm-10">
-                                <input type="hidden" id="status" name="status" value="0">
+                                <input type="hidden" id="status" name="status" value="1">
                                 <div class="form-control" style="border: 0px;box-shadow: none">
                                     <a href="javascript:void(0);" id="isPay">
-                                        <img th:src="@{/static/img/sf/switch-off.svg}" height="24" width="24">
+                                        <img th:src="@{/static/img/sf/switch-on.svg}" height="24" width="24">
                                     </a>
                                 </div>
                             </div>
@@ -304,8 +304,8 @@
                 $('#id').val('');
                 document.getElementById('bookNo').readOnly = false;
                 document.getElementById('serialNo').readOnly = false;
-                $('#status').val(0);
-                $('#isPay').find('img').attr('src', /*[[@{/static/img/sf/switch-off.svg}]]*/);
+                $('#status').val(1);
+                $('#isPay').find('img').attr('src', /*[[@{/static/img/sf/switch-on.svg}]]*/);
                 $('#stockModal').modal('show');
             });
 
