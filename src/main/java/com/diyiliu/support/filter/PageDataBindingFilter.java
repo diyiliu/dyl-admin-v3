@@ -1,5 +1,7 @@
 package com.diyiliu.support.filter;
 
+import com.diyiliu.support.model.BuoyInfo;
+import com.diyiliu.support.util.JacksonUtil;
 import com.diyiliu.web.guide.dto.SiteType;
 import com.diyiliu.web.guide.facade.SiteTypeJpa;
 import com.diyiliu.web.sys.dto.SysRole;
@@ -9,13 +11,18 @@ import com.diyiliu.web.sys.facade.SysUserJpa;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +45,11 @@ public class PageDataBindingFilter {
     @Resource
     private SiteTypeJpa siteTypeJpa;
 
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Resource
+    private Environment environment;
 
     @After("execution(* com.diyiliu.web.home.HomeController.show(..))")
     public void doAfter(JoinPoint joinPoint) {
@@ -69,6 +81,24 @@ public class PageDataBindingFilter {
             if (!menu.contains(".1")) {
                 List<String> names = siteTypes.stream().map(SiteType::getName).collect(Collectors.toList());
                 request.setAttribute("tNames", names);
+            }
+
+            return;
+        }
+
+
+        if ("buoy1".equals(menu)) {
+            String url = environment.getProperty("buoy.server-path") + "/list";
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+            String json = responseEntity.getBody();
+
+            try {
+                List<BuoyInfo> dataInfos = JacksonUtil.toList(json, BuoyInfo.class);
+
+                List<String> names = dataInfos.stream().map(BuoyInfo::getName).collect(Collectors.toList());
+                request.setAttribute("names", names);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             return;

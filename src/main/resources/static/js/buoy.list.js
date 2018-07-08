@@ -1,5 +1,6 @@
 $(function () {
-    Dyl.offsetH('#list-buoy', '#panel-buoy', 75);
+    Dyl.offsetH('#side-menu', '#panel-buoy', 75);
+    $('#side-menu').metisMenu();
 
     var map = new AMap.Map('amap',{
         resizeEnable: true,

@@ -27,29 +27,28 @@
     height: 100%;
     padding: 0 0 0 10px;
 }
-
-.list-buoy {
+/*
+.metismenu {
     overflow-y: scroll;
 }
+*/
 
-.list-buoy li {
-    border: 0px;
+.metismenu li a {
+    color: #777;
+    font-weight: 600;
 }
 
-.list-buoy li a {
-    text-decoration: none;
-    background-repeat: no-repeat;
-    background-size: 16px 16px;
-    padding: 0 0 0 18px;
+.metismenu>li>a:hover,
+.metismenu>li>a:focus{
+    color: #3498db;
 }
 
-.list-buoy li.active a {
-    color: #ffffff;
+.metismenu li.active > ul .active{
+    color: #3498db;
 }
 
-.list-buoy li a:hover {
-    opacity: 0.65;
-    filter: alpha(opacity=65);
+.metismenu li > ul > li a{
+    text-indent: 20px;
 }
 
 /* 修改日期墨绿色主题 */

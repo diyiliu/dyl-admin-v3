@@ -63,3 +63,6 @@ shiro:
 upload:
   image-path: file:./upload/image
   unknown-img: file:./upload/unknown.png
+
+buoy:
+  server-path: http://218.3.247.227:9010/buoy
