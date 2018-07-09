@@ -93,10 +93,12 @@ public class PageDataBindingFilter {
             String json = responseEntity.getBody();
 
             try {
-                List<BuoyInfo> dataInfos = JacksonUtil.toList(json, BuoyInfo.class);
+                List<BuoyInfo> dataInfoList = JacksonUtil.toList(json, BuoyInfo.class);
+                List<String> buoys = dataInfoList.stream().filter(data -> data.getType().equals("3")).map(BuoyInfo::getName).collect(Collectors.toList());
+                List<String> dummies = dataInfoList.stream().filter(data -> data.getType().equals("1")).map(BuoyInfo::getName).collect(Collectors.toList());
 
-                List<String> names = dataInfos.stream().map(BuoyInfo::getName).collect(Collectors.toList());
-                request.setAttribute("names", names);
+                request.setAttribute("buoys", buoys);
+                request.setAttribute("dummies", dummies);
             } catch (IOException e) {
                 e.printStackTrace();
             }

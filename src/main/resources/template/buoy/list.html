@@ -35,8 +35,8 @@
                             <span class="fa arrow"></span>
                         </a>
                         <ul class="nav nav-second-level">
-                            <li th:each="name:${#request.getAttribute('names')}">
-                                <a href="javascript:void(0)" th:onclick=""  th:text="${name}"></a>
+                            <li th:each="name:${#request.getAttribute('buoys')}">
+                                <a href="javascript:void(0)" th:text="${name}"></a>
                             </li>
                         </ul>
                     </li>
@@ -47,11 +47,8 @@
                             <span class="fa arrow"></span>
                         </a>
                         <ul class="nav nav-second-level">
-                            <li>
-                                <a href="#">PG3711981</a>
-                            </li>
-                            <li>
-                                <a href="#">PG3711982</a>
+                            <li th:each="name:${#request.getAttribute('dummies')}">
+                                <a href="javascript:void(0)" th:text="${name}"></a>
                             </li>
                         </ul>
                     </li>
