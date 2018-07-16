@@ -9,7 +9,7 @@ spring:
     prefix: 'classpath:/template/'
     suffix: .html
     encoding: UTF-8
-    mode: HTML5
+    mode: HTML
     cache: false
 
   # ehcache
