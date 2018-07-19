@@ -2,7 +2,7 @@
 # SPRING
 spring:
   profiles:
-    active: prod
+    active: dev
 
   # thymeleaf
   thymeleaf:
@@ -66,3 +66,6 @@ upload:
 
 buoy:
   server-path: http://218.3.247.227:9010/buoy
+
+pet:
+  server-path: https://diyiliu.cc:880

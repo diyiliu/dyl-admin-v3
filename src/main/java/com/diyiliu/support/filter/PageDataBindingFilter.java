@@ -8,6 +8,7 @@ import com.diyiliu.web.sys.dto.SysRole;
 import com.diyiliu.web.sys.dto.SysUser;
 import com.diyiliu.web.sys.facade.SysRoleJpa;
 import com.diyiliu.web.sys.facade.SysUserJpa;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,7 +24,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +75,7 @@ public class PageDataBindingFilter {
             return;
         }
 
-        if (menu.startsWith("guide")) {
+        if ("guide".startsWith(menu)) {
             Sort typeSort = new Sort(new Sort.Order[]{new Sort.Order("sort")});
             List<SiteType> siteTypes = siteTypeJpa.findAll(typeSort);
             request.setAttribute("types", siteTypes);
@@ -105,5 +108,25 @@ public class PageDataBindingFilter {
 
             return;
         }
+
+        if ("pet3".equals(menu)) {
+            String id = request.getParameter("id");
+
+            if (StringUtils.isNotEmpty(id)) {
+                String url = environment.getProperty("pet.server-path") + "/pet/find/" + id;
+                ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+                String json = responseEntity.getBody();
+
+                try {
+                    Map map = JacksonUtil.toObject(json, HashMap.class);
+                    request.setAttribute("pet", map);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return;
+        }
+
     }
 }

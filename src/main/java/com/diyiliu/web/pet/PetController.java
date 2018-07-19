@@ -1,6 +1,7 @@
 package com.diyiliu.web.pet;
 
 import com.diyiliu.support.util.JacksonUtil;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,14 +30,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/pet")
 public class PetController {
-    private final static String PET_URL = "https://diyiliu.cc:880";
-
     @Resource
     private RestTemplate restTemplate;
 
+    @Resource
+    private Environment environment;
+
+
     @PostMapping("/list")
     public Map petList(@RequestParam int pageNo, @RequestParam int pageSize, @RequestParam(required = false) String search) {
-        String url = PET_URL + "/pet/petList";
+        String url = environment.getProperty("pet.server-path") + "/pet/petList";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

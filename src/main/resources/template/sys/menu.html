@@ -24,7 +24,7 @@
 </div>
 <div layout:fragment="content" class="container-fluid">
     <div class="panel panel-default">
-        <div class="panel-body auto-height">
+        <div class="panel-body">
             <div class="btn-group" role="group" id="toolbar">
                 <button type="button" class="btn btn-default" id="addMenu"><i class="fa fa-fw fa-plus"></i></button>
                 <button type="button" class="btn btn-default" id="editMenu"><i class="fa fa-fw fa-pencil"></i></button>
@@ -140,12 +140,8 @@
     <script th:src="@{/static/plugin/treeview/dhtmlxtreeview.min.js}"></script>
     <script th:inline="javascript">
         $(function () {
-            var autoHeight = $("div.auto-height").height();
-            var tableHeight = autoHeight - 0;
-
             var $table = $('#menuTable');
             $table.bootstrapTable({
-                height: tableHeight,
                 sidePagination: 'server',
                 url: /*[[@{/sys/assetList}]]*/,
                 method: 'post',

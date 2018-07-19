@@ -12,7 +12,7 @@
     <div class="cm-breadcrumb-container">
         <ol class="breadcrumb">
             <li><a href="#">宠物管理</a></li>
-            <li class="active">会员管理</li>
+            <li class="active">设备管理</li>
         </ol>
     </div>
     <form id="cm-search" action="index.html" method="get">
@@ -26,18 +26,8 @@
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
                         <div class="col-sm-3 col-md-4">
-                            <input type="text" class="form-control" placeholder="宠物名称" id="search"
+                            <input type="text" class="form-control" placeholder="宠物" id="search"
                                    data-toggle="completer" data-suggest="true">
-                        </div>
-                        <div class="col-sm-4 col-md-3">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="gpsTime" placeholder="时间">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" id="btnTime">
-                                          <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
-                                        </button>
-                                </span>
-                            </div>
                         </div>
                         <div class="col-sm-3 col-md-2">
                             <select id="searchStatus" data-placeholder="设备状态 ..." name="status"
@@ -56,8 +46,10 @@
             <div class="table-panel">
                 <div class="btn-group" role="group" id="toolbar">
                     <button type="button" class="btn btn-default" id="addMem"><i class="fa fa-fw fa-plus"></i></button>
-                    <button type="button" class="btn btn-default" id="editMem"><i class="fa fa-fw fa-pencil"></i></button>
-                    <button type="button" class="btn btn-default" id="delMem"><i class="fa fa-fw fa-trash-o"></i></button>
+                    <button type="button" class="btn btn-default" id="editMem"><i class="fa fa-fw fa-pencil"></i>
+                    </button>
+                    <button type="button" class="btn btn-default" id="delMem"><i class="fa fa-fw fa-trash-o"></i>
+                    </button>
                 </div>
                 <table id="memTable"></table>
             </div>
@@ -65,6 +57,7 @@
     </div>
 </div>
 <div layout:fragment="myJs">
+    <script th:src="@{/static/js/jquery-migrate-1.2.1.js}"></script>
     <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.js}"></script>
     <script th:inline="javascript">
         $(function () {
@@ -120,12 +113,21 @@
                         title: '品种'
                     },
                     {
+                        field: 'step',
+                        title: '今日步数',
+                        align: 'center'
+                    },
+                    {
+                        field: 'voltage',
+                        title: '设备电量',
+                        align: 'center'
+                    },
+                    {
                         field: 'status',
                         title: '设备状态',
-                        align: 'center',
                         formatter: function (value, row, index) {
 
-                            if (value == 0){
+                            if (value == 0) {
 
                                 return '<span class="text-danger">离线</span>'
                             }
@@ -134,39 +136,53 @@
                         }
                     },
                     {
-                        field: 'systemTime',
-                        title: '最新时间',
-                        align: 'center',
-                    },
-                    {
                         field: '',
                         title: '位置',
                         align: 'center',
                         formatter: function (value, row, index) {
-                            return  '<a href="#menuModal" data-toggle="modal" data-id="' + row.id + '"><span class="sf-globe" style="display: inline-block;' +
+                            return '<a href="javascript:void(0);" onclick="toMap(this);" data-id="' + row.id + '"><span class="sf-globe" style="display: inline-block;' +
                                 'width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
                         }
                     },
                     {
-                        field: '',
-                        title: '绑定设备',
-                        align: 'center',
+                        field: 'location',
+                        title: '定位状态',
                         formatter: function (value, row, index) {
-                            return '<a href="#menuModal" data-toggle="modal" data-id="' + row.id + '"><span class="sf-life-buoy" style="display: inline-block;' +
-                                'width: 16px;height: 16px;background-size: 16px 16px;"></span></a>';
+                            if (value == 1) {
+
+                                return 'GPS定位';
+                            } else if (value == 2) {
+
+                                return '基站定位';
+                            } else if (value == 3) {
+
+                                return 'WIFI定位';
+                            }
+
+                            return '无效定位';
                         }
+                    },
+                    {
+                        field: 'systemTime',
+                        title: '最新时间',
+                        align: 'center'
                     }
                 ]
             });
 
-            laydate.render({
-                elem: '#gpsTime'
-                ,type: 'date'
-                ,range: true
-                ,eventElem: '#btnTime'
-                ,trigger: 'click'
+            $('#doSearch').on('click', function () {
+                $table.bootstrapTable("refresh");
             });
+
+            $('#searchStatus').chosen({allow_single_deselect: true});
         })
+
+        function toMap(a) {
+            var id = $(a).data('id');
+            var url = /*[[@{/home/pet3}]]*/;
+            url += '?id=' + id;
+            window.location.href = url;
+        }
     </script>
 </div>
 </body>

@@ -26,12 +26,12 @@
                 <form action="#" class="form-group form-horizontal">
                     <div class="row">
                         <div class="col-sm-3 col-md-4">
-                            <input type="text" class="form-control" placeholder="设备ID" id="search"
+                            <input type="text" class="form-control" placeholder="宠物/设备" id="search"
                                    data-toggle="completer" data-suggest="true">
                         </div>
                         <div class="col-sm-4 col-md-3">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="createTime" placeholder="时间">
+                                <input type="text" class="form-control" id="gpsTime" placeholder="时间">
                                 <span class="input-group-btn">
                                         <button class="btn btn-default" type="button" id="btnTime">
                                              <img th:src="@{/static/img/sf/calendar-clock.svg}" height="18" width="18">
@@ -56,31 +56,51 @@
     <script src="http://webapi.amap.com/maps?v=1.4.6&key=e6f07e683b599f2d9e4c7f79073d1c7b"></script>
     <script th:inline="javascript">
         $(function () {
+            laydate.render({
+                elem: '#gpsTime'
+                , type: 'date'
+                , range: true
+                , eventElem: '#btnTime'
+                , trigger: 'click'
+            });
+
             var autoHeight = $("div.auto-height").height();
             var rowHeight = $('#search-block').height();
             var height = autoHeight - rowHeight;
-            $('#map-panel').height(height - 20);
+            $('#map-panel').height(height - 30);
 
-
-            var position = new AMap.LngLat(117.2633468, 34.25815676);//标准写法
+            // 地图
             var map = new AMap.Map('amap', {
                 resizeEnable: true,
-                zoom: 14,
-                center: position
+                zoom: 15
             });
 
+            // 工具栏
             AMap.plugin(["AMap.ToolBar", "AMap.Scale"], function () {
                 map.addControl(new AMap.ToolBar());
                 map.addControl(new AMap.Scale());
             });
+            // 城市中心
+            map.setCity('徐州市');
 
-            // 创建一个 Marker 实例：
-            var marker = new AMap.Marker({
-                position: position,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-                title: '家'
-            });
-            // 将创建的点标记添加到已有的地图实例：
-            map.add(marker);
+            var pet = [[${pet}]];
+            if (pet) {
+                var name = pet.petInfo.name;
+                $('#search').val(name);
+
+                var location = pet.location;
+                if (location > 0) {
+
+                    var lnglat = [pet.gcj02Lng, pet.gcj02Lat];
+
+                    var marker = new AMap.Marker({
+                        position: lnglat,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+                        title: name
+                    });
+                    map.add(marker);
+                    map.panTo(lnglat);
+                }
+            }
         })
     </script>
 </div>
