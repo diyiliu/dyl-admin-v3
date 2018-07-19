@@ -20,3 +20,9 @@ spring:
 logging:
   level:
         org.springframework.jdbc: info
+
+buoy:
+  server-path: http://192.168.1.51:9010/buoy
+
+pet:
+  server-path: https://diyiliu.cc:880

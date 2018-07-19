@@ -83,22 +83,60 @@
             // 城市中心
             map.setCity('徐州市');
 
+            //实例化信息窗体
+            var content = [];
+            var infoWindow = new AMap.InfoWindow({
+                content: content.join("<br/>"),
+                offset: new AMap.Pixel(0, -20)
+            });
+
             var pet = [[${pet}]];
             if (pet) {
                 var name = pet.petInfo.name;
                 $('#search').val(name);
 
+
                 var location = pet.location;
                 if (location > 0) {
-
                     var lnglat = [pet.gcj02Lng, pet.gcj02Lat];
-
                     var marker = new AMap.Marker({
-                        position: lnglat,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+                        position: lnglat,
                         title: name
                     });
                     map.add(marker);
                     map.panTo(lnglat);
+
+                    var lt = "";
+                    if (location == 1) {
+                        lt = "GPS";
+                    } else if (location == 2) {
+                        lt = "基站";
+                    } else if (location == 3) {
+                        lt = "WIFI";
+                    }
+
+                    var title = "";
+                    if (pet["status"] == 1) {
+                        title = name + " <i class='fa fa-circle' style='color: #2ecc71'></i> ";
+                    }else {
+                        title = name + " <i class='fa fa-circle' style='color: #95a5a6'></i> ";
+                    }
+
+                    var content = [];
+                    content.push(title);
+                    content.push("<i class='fa fa-crosshairs'></i>  " + lt + " 定位");
+                    content.push(pet["systemTime"]);
+
+                    var infoWindow = new AMap.InfoWindow({
+                        content: content.join("<br/>"),
+                        offset: new AMap.Pixel(0, -20)
+                    });
+                    infoWindow.open(map, marker.getPosition());
+
+                    //鼠标点击marker弹出自定义的信息窗体
+                    AMap.event.addListener(marker, 'click', function () {
+                        infoWindow.open(map, marker.getPosition());
+                    });
                 }
             }
         })

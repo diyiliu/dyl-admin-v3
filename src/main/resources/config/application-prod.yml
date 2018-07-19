@@ -12,3 +12,9 @@ spring:
     url: 'jdbc:mysql://localhost:3306/admin3?useUnicode=true&characterEncoding=UTF-8'
     username: root
     password: 123456
+
+buoy:
+  server-path: http://218.3.247.227:9010/buoy
+
+pet:
+  server-path: http://localhost:8800
