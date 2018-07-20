@@ -139,6 +139,22 @@
                     });
                 }
             }
+
+            $('#doSearch').on('click', function () {
+                var param = {};
+                param.search = $('#search').val();
+                param.time = $('#gpsTime').val();
+
+                $.ajax({
+                    type: 'post',
+                    url: /*[[@{/pet/track}]]*/,
+                    data: param,
+                    dataType: "json",
+                    success: function (result) {
+
+                    }
+                });
+            });
         })
     </script>
 </div>

@@ -36,7 +36,6 @@ public class PetController {
     @Resource
     private Environment environment;
 
-
     @PostMapping("/list")
     public Map petList(@RequestParam int pageNo, @RequestParam int pageSize, @RequestParam(required = false) String search) {
         String url = environment.getProperty("pet.server-path") + "/pet/petList";
@@ -62,4 +61,19 @@ public class PetController {
         return respMap;
     }
 
+    @PostMapping("/track")
+    public String petTrack(@RequestParam String search, @RequestParam String time) {
+        String url = environment.getProperty("pet.server-path") + "/pet/track";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap paramMap = new LinkedMultiValueMap();
+        paramMap.add("dateTime", time);
+        paramMap.add("search", search);
+
+        HttpEntity<String> requestEntity = new HttpEntity(paramMap, headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+
+        return responseEntity.getBody();
+    }
 }
