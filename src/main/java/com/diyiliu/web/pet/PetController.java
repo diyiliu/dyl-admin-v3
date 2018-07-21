@@ -62,17 +62,11 @@ public class PetController {
     }
 
     @PostMapping("/track")
-    public String petTrack(@RequestParam String search, @RequestParam String time) {
+    public String petTrack(@RequestParam String search, @RequestParam String dateTime) {
         String url = environment.getProperty("pet.server-path") + "/pet/track";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap paramMap = new LinkedMultiValueMap();
-        paramMap.add("dateTime", time);
-        paramMap.add("search", search);
-
-        HttpEntity<String> requestEntity = new HttpEntity(paramMap, headers);
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+        url += "?search=" + search + "&dateTime=" + dateTime;
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
         return responseEntity.getBody();
     }

@@ -53,12 +53,16 @@
     </div>
 </div>
 <div layout:fragment="myJs">
-    <script src="http://webapi.amap.com/maps?v=1.4.6&key=e6f07e683b599f2d9e4c7f79073d1c7b"></script>
+    <script src="https://webapi.amap.com/maps?key=5577e6cf339dbe2376de0369149210bf&v=1.4.7&plugin=AMap.GraspRoad"></script>
+    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
     <script th:inline="javascript">
+        var map;
+        var marker;
+        var infoWindow;
         $(function () {
             laydate.render({
                 elem: '#gpsTime'
-                , type: 'date'
+                , type: 'datetime'
                 , range: true
                 , eventElem: '#btnTime'
                 , trigger: 'click'
@@ -70,7 +74,7 @@
             $('#map-panel').height(height - 30);
 
             // 地图
-            var map = new AMap.Map('amap', {
+            map = new AMap.Map('amap', {
                 resizeEnable: true,
                 zoom: 15
             });
@@ -83,13 +87,6 @@
             // 城市中心
             map.setCity('徐州市');
 
-            //实例化信息窗体
-            var content = [];
-            var infoWindow = new AMap.InfoWindow({
-                content: content.join("<br/>"),
-                offset: new AMap.Pixel(0, -20)
-            });
-
             var pet = [[${pet}]];
             if (pet) {
                 var name = pet.petInfo.name;
@@ -99,7 +96,7 @@
                 var location = pet.location;
                 if (location > 0) {
                     var lnglat = [pet.gcj02Lng, pet.gcj02Lat];
-                    var marker = new AMap.Marker({
+                    marker = new AMap.Marker({
                         position: lnglat,
                         title: name
                     });
@@ -118,7 +115,7 @@
                     var title = "";
                     if (pet["status"] == 1) {
                         title = name + " <i class='fa fa-circle' style='color: #2ecc71'></i> ";
-                    }else {
+                    } else {
                         title = name + " <i class='fa fa-circle' style='color: #95a5a6'></i> ";
                     }
 
@@ -127,7 +124,7 @@
                     content.push("<i class='fa fa-crosshairs'></i>  " + lt + " 定位");
                     content.push(pet["systemTime"]);
 
-                    var infoWindow = new AMap.InfoWindow({
+                    infoWindow = new AMap.InfoWindow({
                         content: content.join("<br/>"),
                         offset: new AMap.Pixel(0, -20)
                     });
@@ -141,9 +138,19 @@
             }
 
             $('#doSearch').on('click', function () {
+                // 清除标记点
+                if (marker) {
+                    if (infoWindow) {
+                        infoWindow.close();
+                    }
+                    marker.setMap(null);
+                    marker = null;
+                }
+                map.clearMap();
+
                 var param = {};
                 param.search = $('#search').val();
-                param.time = $('#gpsTime').val();
+                param.dateTime = $('#gpsTime').val();
 
                 $.ajax({
                     type: 'post',
@@ -151,11 +158,86 @@
                     data: param,
                     dataType: "json",
                     success: function (result) {
-
+                        if (result) {
+                            showTrack(result);
+                        }
+                    },
+                    error: function () {
+                        alertTip('error', '查询失败');
                     }
                 });
             });
-        })
+        });
+
+        function showTrack(data) {
+            var pathParam = [];
+            var lineArr = [];
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                var ll = [d.gcj02Lng, d.gcj02Lat];
+                lineArr.push(ll);
+
+                var param = {};
+                param.x = d.gcj02Lng;
+                param.y = d.gcj02Lat;
+                param.sp = d.speed;
+                param.ag = d.direction;
+                var t = new Date(data[i].gpsTime).getTime();
+                if (i == 0) {
+                    param.tm = t;
+                } else {
+                    param.tm = (t - new Date(data[0].gpsTime).getTime()) * 0.001;
+                }
+                pathParam.push(param);
+            }
+
+/*
+            var path2 = [];
+            new AMap.GraspRoad().driving(pathParam, function (error, result) {
+                alert(JSON.stringify(result));
+                if (!error) {
+                    var newPath = result.data.points;
+                    for (var i = 0; i < newPath.length; i += 1) {
+                        path2.push([newPath[i].x, newPath[i].y])
+                    }
+                }
+            });
+*/
+
+            marker = new AMap.Marker({
+                map: map,
+                position: lineArr[0],
+                icon: /*[[@{/static/img/animal/dog_32.png}]]*/,
+                offset: new AMap.Pixel(-16, -16),
+                autoRotation: true
+            });
+
+            // 绘制轨迹
+            var polyline = new AMap.Polyline({
+                map: map,
+                path: lineArr,
+                strokeColor: "#66AA00",  //线颜色
+                strokeWeight: 5,      //线宽
+                strokeOpacity: 0.7,
+                showDir: true
+            });
+
+            var passedPolyline = new AMap.Polyline({
+                map: map,
+                strokeColor: "#0099C6",  //线颜色
+                // strokeOpacity: 1,     //线透明度
+                strokeWeight: 5,      //线宽
+                strokeOpacity: 0.7,
+                // strokeStyle: "solid"  //线样式
+            });
+
+            marker.on('moving', function (e) {
+                passedPolyline.setPath(e.passedPath);
+            });
+
+            map.setFitView();
+            marker.moveAlong(lineArr, 650);
+        }
     </script>
 </div>
 </body>
